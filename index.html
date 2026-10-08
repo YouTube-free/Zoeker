@@ -1,163 +1,306 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTune</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="style.css"/>
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-
-  <!-- ── iOS / Apple Home Screen ── -->
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="YouTune"/>
-  <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
-
-  <!-- ── PWA Manifest ── -->
-  <link rel="manifest" href="manifest.json"/>
-  <meta name="theme-color" content="#FF2D55"/>
-  <meta name="mobile-web-app-capable" content="yes"/>
-
-  <!-- ── Open Graph ── -->
-  <meta property="og:title" content="YouTune"/>
-  <meta property="og:description" content="Minimalistische YouTube-ervaring"/>
-  <meta property="og:image" content="og-image.svg"/>
-  <meta property="og:type" content="website"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waar zit ik in de trein?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e8edf3;--ink:#10213a;--muted:#55657d;--lijn:#c4cedb;--blauw:#0b3b8c;--accent:#ffc20e;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0 auto;max-width:520px;padding:16px 16px 48px;background:var(--bg);color:var(--ink);font:400 17px/1.4 Barlow,system-ui,sans-serif}
+h1{font:700 34px/1.05 'Barlow Condensed',system-ui,sans-serif;margin:8px 0 12px}
+.demo{background:var(--accent);padding:8px 12px;border-radius:10px;font-size:15px;margin-bottom:14px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+button{font:inherit;cursor:pointer}
+.tab{padding:10px;border:2px solid var(--blauw);background:transparent;color:var(--blauw);border-radius:12px;font-weight:600}
+.tab[aria-selected=true]{background:var(--blauw);color:#fff}
+label{display:block;font-weight:600;margin:10px 0 4px}
+input{width:100%;font:inherit;padding:12px;border:2px solid var(--lijn);border-radius:12px;background:#fff;color:var(--ink)}
+.rij{display:grid;grid-template-columns:2fr 1fr;gap:8px}
+.knop{width:100%;margin-top:14px;padding:13px;border:0;border-radius:12px;background:var(--blauw);color:#fff;font-weight:600}
+.tekst{padding:11px;border:2px solid var(--blauw);border-radius:12px;background:transparent;color:var(--blauw);font-weight:600}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.melding{margin-top:12px;color:#9b1c1c;font-weight:600}
+.lijst{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:6px}
+.lijst button{width:100%;display:grid;grid-template-columns:56px 1fr auto;gap:10px;align-items:center;text-align:left;padding:10px 12px;border:2px solid var(--lijn);border-radius:12px;background:#fff;color:var(--ink)}
+.lijst .t{font:700 24px/1 'Barlow Condensed',sans-serif}
+.lijst small{display:block;color:var(--muted)}
+.lijst .vervalt{text-decoration:line-through;opacity:.55}
+#kaart{margin-top:16px;background:#fff;border-radius:18px;padding:14px}
+#kaart h2{font:700 28px/1.05 'Barlow Condensed',sans-serif;margin:0}
+#kaart p{margin:2px 0 10px;color:var(--muted)}
+.kop{font-size:14px;color:var(--muted);margin-bottom:4px}
+.deelnaam{font-size:14px;color:var(--muted);margin:14px 0 4px}
+:root{--h:44px}
+@media (min-width:480px){:root{--h:60px}}
+.bakrij{display:flex;align-items:center;gap:8px;width:100%;margin:3px 0;padding:4px 8px 4px 2px;border:2px solid transparent;border-radius:12px;background:transparent;color:var(--ink);text-align:left}
+.bakrij[aria-pressed=true]{background:rgba(255,194,14,.55);border-color:var(--ink)}
+.bnr{flex:none;width:42px;text-align:center;font:700 30px/1 'Barlow Condensed',sans-serif}
+.knip{flex:none;position:relative;height:var(--h);overflow:hidden;line-height:0}
+.knip.spiegel{transform:scaleX(-1)}
+.knip img{position:absolute;top:0;left:0;height:var(--h);width:auto;max-width:none}
+#zones{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.chip{padding:11px 6px;border:2px solid var(--blauw);border-radius:12px;background:#fff;color:var(--blauw);font-weight:600}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--ink);color:var(--ink)}
+#keuze{margin:14px 0 0;font:700 26px/1.1 'Barlow Condensed',sans-serif}
+.acties{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.acties .knop{margin:0}
+[hidden]{display:none!important}
+</style>
 </head>
 <body>
+<h1>Waar zit ik in de trein?</h1>
+<div id="demo" class="demo" hidden>Demo met nepdata. Vul bovenin het script je Worker-URL in voor echte treinen.</div>
 
-<!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
-      <rect width="30" height="30" rx="9" fill="#FF2D55"/>
-      <path d="M12 9.5L21 15L12 20.5V9.5Z" fill="white"/>
-    </svg>
-    <span class="logo-text">YouTune</span>
-  </div>
-
-  <nav class="sidebar-nav">
-    <a href="#" class="nav-item active" data-view="home">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span>Home</span>
-    </a>
-    <a href="#" class="nav-item" data-view="subscriptions">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-      <span>Abonnementen</span>
-      <span class="nav-badge" id="sub-badge"></span>
-    </a>
-    <a href="#" class="nav-item" data-view="saved">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
-      <span>Opgeslagen</span>
-      <span class="nav-badge" id="saved-badge"></span>
-    </a>
-  </nav>
-
-  <div class="sidebar-divider" id="sb-divider" style="display:none"></div>
-  <p class="sidebar-section-lbl" id="sb-ch-label" style="display:none">Kanalen</p>
-  <div class="sidebar-channels" id="sidebar-channels"></div>
-</aside>
-
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-<!-- ═══════════════════════════ MAIN ═══════════════════════════ -->
-<main class="main">
-
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <button class="menu-btn" id="menu-btn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-
-    <div class="search-area">
-      <div class="search-toggle" id="search-toggle">
-        <button class="stoggle-btn active" data-type="video">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-          Video's
-        </button>
-        <button class="stoggle-btn" data-type="channel">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Kanalen
-        </button>
-      </div>
-      <div class="search-bar">
-        <svg class="search-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="search-input" placeholder="Zoek video's…" autocomplete="off" spellcheck="false"/>
-        <button id="search-btn" class="search-go">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <span class="api-live" title="YouTube API verbonden"></span>
-  </header>
-
-  <!-- ─── HOME ─── -->
-  <div class="view active" id="view-home">
-    <div class="view-hdr"><h1 class="view-title">Home</h1></div>
-    <div id="home-content"></div>
-  </div>
-
-  <!-- ─── SUBSCRIPTIONS ─── -->
-  <div class="view" id="view-subscriptions">
-    <div class="view-hdr">
-      <h1 class="view-title">Abonnementen</h1>
-      <p class="view-sub" id="subs-sub">Beheer je kanalen</p>
-    </div>
-    <div class="channels-grid" id="subs-grid"></div>
-  </div>
-
-  <!-- ─── SAVED ─── -->
-  <div class="view" id="view-saved">
-    <div class="view-hdr">
-      <h1 class="view-title">Opgeslagen</h1>
-      <p class="view-sub" id="saved-sub">Je bewaarde video's</p>
-    </div>
-    <div class="video-grid" id="saved-grid"></div>
-  </div>
-
-  <!-- ─── SEARCH RESULTS ─── -->
-  <div class="view" id="view-search">
-    <div class="view-hdr">
-      <button class="back-btn" id="search-back">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-      </button>
-      <div>
-        <h1 class="view-title" id="search-title">Zoeken</h1>
-        <p class="view-sub" id="search-sub"></p>
-      </div>
-    </div>
-    <div id="search-content"></div>
-  </div>
-
-  <!-- ─── CHANNEL DETAIL ─── -->
-  <div class="view" id="view-channel">
-    <div id="channel-content"></div>
-  </div>
-
-</main>
-
-<!-- ═══════════════════════════ VIDEO MODAL ═══════════════════════════ -->
-<div class="modal" id="modal">
-  <div class="modal-bg" id="modal-bg"></div>
-  <div class="modal-box">
-    <button class="modal-close" id="modal-close">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <div class="modal-player" id="modal-player"></div>
-    <div class="modal-info" id="modal-info"></div>
-  </div>
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" id="tab-nummer" aria-selected="true">Treinnummer</button>
+  <button class="tab" role="tab" id="tab-station" aria-selected="false">Station en tijd</button>
 </div>
 
-<!-- ═══════════════════════════ TOASTS ═══════════════════════════ -->
-<div id="toasts"></div>
+<form id="f-nummer">
+  <label for="nummer">Treinnummer (staat in de NS-app)</label>
+  <input id="nummer" inputmode="numeric" placeholder="bijv. 2150" required>
+  <button class="knop" type="submit">Toon trein</button>
+</form>
 
-<script src="app.js"></script>
+<form id="f-station" hidden>
+  <div class="rij">
+    <div><label for="station">Vertrekstation</label><input id="station" list="stations" placeholder="Utrecht Centraal" required></div>
+    <div><label for="tijd">Vanaf</label><input id="tijd" type="time" required></div>
+  </div>
+  <datalist id="stations"></datalist>
+  <button class="knop" type="submit">Zoek treinen</button>
+</form>
+
+<div id="melding" class="melding" role="alert" hidden></div>
+<ul id="treinen" class="lijst" hidden></ul>
+
+<section id="kaart" hidden aria-live="polite">
+  <h2 id="k-titel"></h2>
+  <p id="k-sub"></p>
+  <div class="kop">Voorkant bovenaan. Klopt de richting niet? Tik op Draai trein om.</div>
+  <div id="bakken"></div>
+  <div id="zones" hidden></div>
+  <div id="keuze"></div>
+  <div class="acties">
+    <button class="knop" id="deel">Deel mijn plek</button>
+    <button class="tekst" id="draai">Draai trein om</button>
+  </div>
+  <button class="tekst" id="terug" style="width:100%;margin-top:8px">Andere trein</button>
+  <p style="margin-top:12px;font-size:14px">Maak een screenshot van deze kaart en stuur hem naar je vrienden.</p>
+</section>
+
+<script>
+// ====== INSTELLINGEN ======
+// Plak hier de URL van je Cloudflare Worker, zonder slash aan het eind.
+// Leeg laten = demomodus met nepdata. Voeg ?demo=1 toe aan de pagina-URL om demo af te dwingen.
+const WORKER_URL = "";
+const DEMO = !WORKER_URL || location.search.includes("demo");
+
+const STATIONS = [["Utrecht Centraal","UT"],["Amsterdam Centraal","ASD"],["Rotterdam Centraal","RTD"],["Den Haag Centraal","GVC"],["Zwolle","ZL"],["Arnhem Centraal","AH"],["Eindhoven Centraal","EHV"],["Groningen","GN"],["Delft","DT"],["Zutphen","ZP"],["Leiden Centraal","LEDN"],["Amersfoort Centraal","AMF"]];
+
+// ====== HULPFUNCTIES ======
+const $ = id => document.getElementById(id);
+const h = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); e.append(...kids); return e; };
+const fmt = t => /^\d\d:\d\d$/.test(t) ? t : new Date(t).toLocaleTimeString("nl-NL", {hour:"2-digit", minute:"2-digit"});
+const pad = n => String(n).padStart(2, "0");
+function isoMetOffset(d) {
+  const o = -d.getTimezoneOffset(), s = o >= 0 ? "+" : "-";
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00${s}${pad(Math.floor(Math.abs(o)/60))}:${pad(Math.abs(o)%60)}`;
+}
+function melding(tekst) { $("melding").textContent = tekst || ""; $("melding").hidden = !tekst; }
+
+// ====== EIGEN PLAATJES (map plaatjes/) ======
+// grenzen = pixelpositie van het begin van elke bak plus het eind van het plaatje. type = herkenning op de typenaam van NS.
+const PLAATJES = [
+  {bestand: "ddz-6.png",        type: /DDZ/,      n: 6, grenzen: [0, 558, 1110, 1662, 2214, 2766, 3215]},
+  {bestand: "ddz-4.png",        type: /DDZ/,      n: 4, grenzen: [0, 558, 1110, 1662, 2111]},
+  {bestand: "virm-6.png",       type: /VIRM/,     n: 6, grenzen: [0, 570, 1122, 1687, 2254, 2806, 3376]},
+  {bestand: "virm-6-nieuw.png", type: /^$/,       n: 6, grenzen: [0, 570, 1122, 1687, 2254, 2806, 3376]}, // nieuwe stijl, nog niet gekoppeld
+  {bestand: "flirt-4.png",      type: /SNG|FLIRT/, n: 4, grenzen: [0, 475, 838, 1204, 1682]},
+  {bestand: "flirt-3.png",      type: /SNG|FLIRT/, n: 3, grenzen: [0, 475, 838, 1317]},
+  {bestand: "icng-8.png",       type: /ICNG/,     n: 8, grenzen: [0, 489, 875, 1260, 1720, 2177, 2562, 2948, 3442]}
+];
+function zoekPlaatje(type, n) {
+  const m = PLAATJES.find(x => x.n === n && x.type.test(type));
+  return m && {bestand: m.bestand, breedtes: m.grenzen.slice(1).map((g, i) => g - m.grenzen[i])};
+}
+
+// ====== DEMODATA (nep) ======
+const DEMO_TYPES = [{type:"ICNG", delen:[8]}, {type:"FLIRT", delen:[4,3]}, {type:"DDZ", delen:[6,4]}, {type:"VIRM", delen:[6]}];
+const DEMO_NAAR = ["Zwolle","Eindhoven Centraal","Amsterdam Centraal","Arnhem Centraal","Rotterdam Centraal"];
+function demoVertrek(tijd) {
+  const [u, m] = tijd.split(":").map(Number);
+  return [0,7,14,22,31].map((plus, i) => {
+    const t = u*60 + m + plus;
+    return {nr: 2150 + i*13, soort: i % 2 ? "SPR" : "IC", naar: DEMO_NAAR[i], tijd: `${pad(Math.floor(t/60)%24)}:${pad(t%60)}`, spoor: String(3+i), vervalt: false};
+  });
+}
+function demoTrein(nr) { const t = DEMO_TYPES[nr % DEMO_TYPES.length]; return {delen: t.delen.map(n => ({type: t.type, n, img: null, breedtes: Array(n).fill(1)}))}; }
+
+// ====== API (echt) ======
+async function api(pad) {
+  const r = await fetch(WORKER_URL + pad);
+  if (!r.ok) throw new Error(r.status === 403 ? "De Worker weigert dit domein (controleer TOEGESTAAN in de Worker)." : `NS antwoordde met fout ${r.status}.`);
+  return r.json();
+}
+// Veldnamen gebaseerd op de NS-documentatie. Klopt iets niet? Zie console.log en stuur het antwoord door.
+function leesVertrek(j) {
+  return ((j.payload || j).departures || []).map(d => ({
+    nr: d.product && d.product.number, soort: d.product && d.product.shortCategoryName, naar: d.direction,
+    tijd: d.actualDateTime || d.plannedDateTime, spoor: d.actualTrack || d.plannedTrack, vervalt: !!d.cancelled
+  })).filter(t => t.nr);
+}
+function leesTrein(j) {
+  const d = (j.payload || j).materieeldelen || [];
+  const url = a => !a ? null : (typeof a === "string" ? a : a.url || null);
+  return {delen: d.map(x => ({
+    type: x.type || "", n: (x.bakken || []).length, img: url(x.afbeelding),
+    breedtes: (x.bakken || []).map(b => (b.afbeelding && b.afbeelding.breedte) || b.breedte || 1)
+  })).filter(x => x.n > 0)};
+}
+
+// ====== ACTIES ======
+let trein = null, info = {}, omgekeerd = false, keuze = null;
+
+async function toonTrein(nr, meta = {}) {
+  melding(""); info = {nr, ...meta};
+  try {
+    const t = DEMO ? demoTrein(Number(nr)) : leesTrein(await api(`/trein?nummer=${encodeURIComponent(nr)}`));
+    if (!t.delen.length) { console.log("Geen bakken gevonden"); throw new Error("Geen samenstelling gevonden voor dit treinnummer. Het antwoord van NS heeft mogelijk een ander formaat."); }
+    trein = t; omgekeerd = false; keuze = null;
+    $("treinen").hidden = true; $("kaart").hidden = false;
+    tekenKaart();
+    $("kaart").scrollIntoView({behavior: "smooth"});
+  } catch (e) { melding(e.message); }
+}
+
+function tekenKaart() {
+  const totaal = trein.delen.reduce((s, d) => s + d.n, 0);
+  $("k-titel").textContent = `${info.soort || "Trein"} ${info.nr}${info.naar ? " naar " + info.naar : ""}`;
+  $("k-sub").textContent = `${info.tijd ? fmt(info.tijd) + (info.spoor ? ", spoor " + info.spoor + ". " : ". ") : ""}${trein.delen[0].type}, ${trein.delen.length} ${trein.delen.length === 1 ? "deel" : "delen"}, ${totaal} bakken`;
+  // per deel: welk plaatje en welk stukje daarvan bij welke bak hoort
+  let delen = trein.delen.map(d => {
+    let src = null, gewichten = d.breedtes;
+    if (d.img && !DEMO) { laadPlaatje(d.img); src = bronCache.get(d.img); }
+    if (!src) {
+      const l = zoekPlaatje(d.type, d.n);
+      if (l) { src = "plaatjes/" + l.bestand; gewichten = l.breedtes; }
+      else { src = "data:image/svg+xml," + encodeURIComponent(svgSet(d.type, d.n)); gewichten = Array(d.n).fill(1); }
+    }
+    const som = gewichten.reduce((a, b) => a + b, 0); let acc = 0;
+    const bakken = gewichten.map(g => { const f = [acc / som, (acc + g) / som]; acc += g; return f; });
+    return {type: d.type, src, bakken};
+  });
+  if (omgekeerd) { delen.reverse(); delen.forEach(d => d.bakken.reverse()); }
+  const box = $("bakken"); box.replaceChildren();
+  let teller = 0;
+  delen.forEach((d, di) => {
+    box.append(h("div", {className: "deelnaam", textContent: `${d.type}, deel ${di + 1}`}));
+    d.bakken.forEach(([f0, f1]) => {
+      const nr = ++teller;
+      box.append(h("button", {className: "bakrij", type: "button", ariaLabel: `Bak ${nr}`, ariaPressed: String(!!keuze && keuze.bak === nr),
+        onclick: () => { keuze = {bak: nr, zone: keuze && keuze.bak === nr ? keuze.zone : null}; tekenKaart(); }},
+        h("span", {className: "bnr", textContent: nr}), knip(d.src, f0, f1, omgekeerd)));
+    });
+  });
+  const zb = $("zones"); zb.replaceChildren(); zb.hidden = !keuze;
+  if (keuze) ["Voorin", "Midden", "Achterin"].forEach(z => zb.append(h("button", {className: "chip", type: "button", textContent: z,
+    ariaPressed: String(keuze.zone === z), onclick: () => { keuze.zone = keuze.zone === z ? null : z; tekenKaart(); }})));
+  $("keuze").textContent = keuze ? zin(totaal) : "Tik op de bak waar je zit.";
+}
+// Knipt het stukje f0..f1 (fractie van de breedte) uit een plaatje van een heel treinstel.
+function knip(src, f0, f1, spiegel) {
+  const doos = h("span", {className: "knip" + (spiegel ? " spiegel" : "")});
+  const img = h("img", {alt: "", src});
+  img.onload = () => {
+    const w = img.naturalWidth / img.naturalHeight * (img.clientHeight || 44);
+    doos.style.width = (f1 - f0) * w + "px"; img.style.left = -f0 * w + "px";
+  };
+  doos.append(img); return doos;
+}
+
+const zin = (totaal = trein.delen.reduce((s, d) => s + d.n, 0)) => `Ik zit in bak ${keuze.bak} van ${totaal}${keuze.zone ? ", " + keuze.zone.toLowerCase() : ""}.`;
+
+// ====== PLAATJES ======
+// Echte afbeelding van NS (via de Worker). Lukt dat niet, dan blijft de getekende versie staan.
+const bronCache = new Map(); // NS-plaatje-URL -> blob-URL
+async function laadPlaatje(url) {
+  if (bronCache.has(url)) return;
+  bronCache.set(url, null);
+  try {
+    const r = await fetch(`${WORKER_URL}/plaatje?url=${encodeURIComponent(url)}`);
+    if (!r.ok) throw new Error(r.status);
+    bronCache.set(url, URL.createObjectURL(await r.blob()));
+    tekenKaart();
+  } catch (e) { console.log("Plaatje niet geladen", e); }
+}
+// Getekende zijaanzichten (demo en reserve), geen foto's.
+function svgSet(type, n) {
+  const dd = /VIRM|DDZ|DDNG/i.test(type), wit = /SNG|SLT|FLIRT/i.test(type);
+  const body = wit ? "#fff" : "#ffc917", band = wit ? "#1d57b8" : "#0b4fb3", deur = wit ? "#ffc917" : "#e0a800";
+  const top = dd ? 4 : 14, hoog = dd ? 42 : 32;
+  let g = `<rect x="0" y="57" width="${n*110+4}" height="2" fill="#10213a"/>`;
+  for (let i = 0; i < n; i++) {
+    const x = i*110 + 3;
+    g += `<rect x="${x}" y="${top}" width="104" height="${hoog}" rx="7" fill="${body}" stroke="#10213a" stroke-width="1.5"/>`;
+    g += `<rect x="${x+1}" y="${top + (dd ? 20 : 17)}" width="102" height="${dd ? 6 : 7}" fill="${band}"/>`;
+    for (const y of dd ? [top + 6, top + 28] : [top + 5]) for (let k = 0; k < 5; k++)
+      g += `<rect x="${x+22+k*14}" y="${y}" width="10" height="${dd ? 9 : 10}" rx="2" fill="#2b3a52"/>`;
+    for (const dx of [5, 87]) g += `<rect x="${x+dx}" y="${top+4}" width="12" height="${hoog-6}" rx="2" fill="${deur}" stroke="#10213a"/>`;
+    for (const cx of [x+22, x+82]) g += `<circle cx="${cx}" cy="52" r="5" fill="#10213a"/>`;
+  }
+  return `<svg viewBox="0 0 ${n*110+4} 62" width="${n*110+4}" height="62" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${type}">${g}</svg>`;
+}
+
+// ====== EVENTS ======
+function tab(naam) {
+  $("tab-nummer").ariaSelected = String(naam === "nummer"); $("tab-station").ariaSelected = String(naam === "station");
+  $("f-nummer").hidden = naam !== "nummer"; $("f-station").hidden = naam !== "station";
+  $("treinen").hidden = true; melding("");
+}
+$("tab-nummer").onclick = () => tab("nummer");
+$("tab-station").onclick = () => tab("station");
+
+$("f-nummer").onsubmit = e => { e.preventDefault(); toonTrein($("nummer").value.trim()); };
+
+$("f-station").onsubmit = async e => {
+  e.preventDefault(); melding("");
+  const waarde = $("station").value.trim();
+  const gevonden = STATIONS.find(s => s[0].toLowerCase() === waarde.toLowerCase());
+  const code = gevonden ? gevonden[1] : waarde.toUpperCase();
+  try {
+    let lijst;
+    if (DEMO) lijst = demoVertrek($("tijd").value);
+    else {
+      const [u, m] = $("tijd").value.split(":").map(Number), d = new Date(); d.setHours(u, m, 0, 0);
+      lijst = leesVertrek(await api(`/vertrek?station=${encodeURIComponent(code)}&dateTime=${encodeURIComponent(isoMetOffset(d))}&maxJourneys=20`));
+    }
+    if (!lijst.length) throw new Error("Geen treinen gevonden. Controleer het station (gebruik de stationscode, bijv. UT).");
+    const ul = $("treinen"); ul.replaceChildren();
+    lijst.forEach(t => ul.append(h("li", {}, h("button", {type: "button", className: t.vervalt ? "vervalt" : "", onclick: () => toonTrein(t.nr, t)},
+      h("span", {className: "t", textContent: fmt(t.tijd)}),
+      h("span", {}, `${t.soort || ""} naar ${t.naar || "?"}`, h("small", {textContent: `Trein ${t.nr}${t.vervalt ? ", rijdt niet" : ""}`})),
+      h("span", {textContent: t.spoor ? "spoor " + t.spoor : ""})))));
+    ul.hidden = false;
+  } catch (err) { melding(err.message); }
+};
+
+$("draai").onclick = () => { omgekeerd = !omgekeerd; keuze = null; tekenKaart(); };
+$("terug").onclick = () => { $("kaart").hidden = true; keuze = null; if (!$("f-station").hidden && $("treinen").children.length) $("treinen").hidden = false; window.scrollTo({top: 0, behavior: "smooth"}); };
+$("deel").onclick = async () => {
+  if (!keuze) return melding("Tik eerst op je plek in de trein.");
+  melding("");
+  const tekst = `${zin()} ${info.soort || "Trein"} ${info.nr}${info.naar ? " naar " + info.naar : ""}.`;
+  try { if (navigator.share) await navigator.share({text: tekst}); else { await navigator.clipboard.writeText(tekst); melding("Tekst gekopieerd."); } } catch (_) {}
+};
+
+// ====== START ======
+STATIONS.forEach(s => $("stations").append(h("option", {value: s[0]})));
+const nu = new Date(); $("tijd").value = `${pad(nu.getHours())}:${pad(nu.getMinutes())}`;
+$("demo").hidden = !DEMO;
+</script>
 </body>
 </html>
