@@ -169,16 +169,11 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
   <div id="bakken"></div>
   <div id="keuze"></div>
   <div class="acties">
-    <button class="knop" id="deel">Deel mijn plek</button>
+    <button class="knop" id="kopieer">Kopieer foto en tekst</button>
     <button class="tekst" id="draai">Draai trein om</button>
   </div>
-  <div class="acties" style="margin-top:8px">
-    <button class="tekst" id="bewaar" type="button">Bewaar foto</button>
-    <button class="tekst" id="tekstkopie" type="button">Kopieer tekst</button>
-  </div>
-  <a class="knop" id="snap" href="snapchat://" style="display:block;text-align:center;text-decoration:none;margin-top:8px;background:#fffc00;color:#10213a">Open Snapchat</a>
   <button class="tekst" id="terug" style="width:100%;margin-top:8px">Andere trein</button>
-  <p style="margin-top:12px;font-size:14px">Tik op Deel mijn plek om een plaatje met je plek te sturen. Wil je rechtstreeks naar de Snapchat-app? Tik eerst op Bewaar foto, daarna op Open Snapchat en kies het plaatje uit je rolletje.</p>
+  <p style="margin-top:12px;font-size:14px">Tik op Kopieer, open daarna Snapchat (of een andere app) en plak het in je chat.</p>
 </section>
 
 <script>
@@ -389,7 +384,7 @@ async function maakDeelplaatje() {
   const sx0 = P + (IW - stripB) / 2, sx1 = sx0 + stripB;
   const sub = [titel(), info.tijd ? `${fmt(info.tijd)}${info.spoor ? ", spoor " + info.spoor : ""}` : ""].filter(Boolean);
   const H = 60 + 98 + 60 + sub.length * 44 + 28 + 36 + 16 + (meer ? 52 : 0) + BLH + 60 + bh + 24 + 14 + 40 + 36 + 26 + 56;
-  const H2 = Math.max(H, 1920), off = Math.round((H2 - H) / 2); // 9:16 is het formaat dat Snapchat verwacht
+  const H2 = Math.max(H, 1920), off = Math.round((H2 - H) / 2); // staand schermformaat (9:16)
   const cv = document.createElement("canvas"); cv.width = W; cv.height = H2;
   const c = cv.getContext("2d");
   const g = c.createLinearGradient(0, 0, 0, H2); g.addColorStop(0, "#0d44a0"); g.addColorStop(1, "#08296a");
@@ -800,11 +795,11 @@ $("f-station").onsubmit = async e => {
 
 $("draai").onclick = () => { omgekeerd = !omgekeerd; keuze = null; tekenKaart(); };
 $("terug").onclick = () => { $("kaart").hidden = true; $("zelf").hidden = false; keuze = null; if (!$("f-station").hidden && $("treinen").children.length) $("treinen").hidden = false; window.scrollTo({top: 0, behavior: "smooth"}); };
-// De foto wordt al gemaakt zodra je een plek kiest. Telefoons laten delen alleen toe direct na je tik, dus daar mag niets meer op gewacht worden.
+// De foto wordt al gemaakt zodra je een plek kiest, zodat kopieren direct bij je tik kan (telefoons eisen dat).
 let fotoKlaar = null, fotoGeld = 0;
 async function fotoBlobMaken() {
   const cv = await maakDeelplaatje();
-  return new Promise((ok, fout) => cv.toBlob(x => x ? ok(x) : fout(new Error("toBlob")), "image/jpeg", 0.92));
+  return new Promise((ok, fout) => cv.toBlob(x => x ? ok(x) : fout(new Error("toBlob")), "image/png")); // het klembord neemt alleen png aan
 }
 function bereidFotoVoor() {
   fotoKlaar = null;
@@ -812,39 +807,30 @@ function bereidFotoVoor() {
   const id = ++fotoGeld;
   setTimeout(() => { if (id === fotoGeld) fotoBlobMaken().then(b => { if (id === fotoGeld) fotoKlaar = b; }).catch(e => console.warn(e)); }, 250);
 }
-// Snapchat openen: iPhone gebruikt snapchat://, Android heeft een intent-adres nodig.
-const snapLink = () => /Android/i.test(navigator.userAgent) ? "intent://#Intent;scheme=snapchat;package=com.snapchat.android;end" : "snapchat://";
-$("snap").href = snapLink();
 const deelZin = () => `${zin()} ${titel()}.`;
-$("deel").onclick = async () => {
+let kopieerTimer = 0;
+function kopieerMelding(tekst) {
+  $("kopieer").textContent = tekst; clearTimeout(kopieerTimer);
+  kopieerTimer = setTimeout(() => { $("kopieer").textContent = "Kopieer foto en tekst"; }, 3500);
+}
+$("kopieer").onclick = async () => {
   if (!keuze) return melding("Tik eerst op je plek in de trein.");
   melding("");
-  let blob = fotoKlaar;
-  if (!blob) { try { blob = await fotoBlobMaken(); } catch (e) { console.warn(e); return deelTekst(deelZin()); } }
-  const file = new File([blob], "treinplek.jpg", {type: "image/jpeg"});
+  const foto = fotoKlaar ? Promise.resolve(fotoKlaar) : fotoBlobMaken(), tekst = new Blob([deelZin()], {type: "text/plain"});
   try {
-    // Alleen het plaatje, zonder tekst: de tekst staat al in het plaatje. Apps zoals Snapchat verslikken zich soms in plaatje + tekst tegelijk.
-    if (navigator.canShare && navigator.canShare({files: [file]})) { await navigator.share({files: [file]}); return; }
-  } catch (e) { if (e.name === "AbortError") return; console.warn(e); }
-  toonOverlay(URL.createObjectURL(blob), deelZin());
+    try { await navigator.clipboard.write([new ClipboardItem({"image/png": foto, "text/plain": tekst})]); }
+    catch (e) { await navigator.clipboard.write([new ClipboardItem({"image/png": foto})]); } // sommige telefoons nemen plaatje en tekst niet samen aan
+    kopieerMelding("Gekopieerd! Plak het in je chat");
+  } catch (e) {
+    console.warn(e);
+    try { toonOverlay(URL.createObjectURL(await foto), deelZin()); } catch (_) { melding("Kopieren lukte niet."); }
+  }
 };
-$("bewaar").onclick = async () => {
-  if (!keuze) return melding("Tik eerst op je plek in de trein.");
-  try { toonOverlay(URL.createObjectURL(fotoKlaar || await fotoBlobMaken()), deelZin()); } catch (e) { melding("De foto maken lukte niet."); }
-};
-$("tekstkopie").onclick = async () => {
-  if (!keuze) return melding("Tik eerst op je plek in de trein.");
-  try { await navigator.clipboard.writeText(deelZin()); melding("Tekst gekopieerd. Plak hem in je chat."); } catch (_) { melding(deelZin()); }
-};
-async function deelTekst(tekst) {
-  try { if (navigator.share) await navigator.share({text: tekst}); else { await navigator.clipboard.writeText(tekst); melding("Tekst gekopieerd."); } } catch (_) {}
-}
 function toonOverlay(url, tekst) {
   const o = h("div", {id: "overlay"},
-    h("p", {textContent: "Houd je vinger op het plaatje en kies Bewaar. Open daarna Snapchat en kies hem uit je rolletje."}),
+    h("p", {textContent: "Kopieren lukte niet. Houd je vinger op het plaatje en kies Bewaar of Kopieer."}),
     h("img", {src: url, alt: tekst}),
     h("a", {className: "knop", href: url, download: "treinplek.jpg", textContent: "Opslaan als bestand", style: "max-width:300px;text-align:center;text-decoration:none;margin:0"}),
-    h("a", {className: "knop", href: snapLink(), textContent: "Open Snapchat", style: "max-width:300px;text-align:center;text-decoration:none;margin:0;background:#fffc00;color:#10213a"}),
     h("button", {className: "knop", type: "button", textContent: "Sluiten", style: "max-width:300px", onclick: () => o.remove()}));
   document.body.append(o);
 }
