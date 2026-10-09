@@ -20,9 +20,9 @@
 body{margin:0 auto;max-width:520px;padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));-webkit-tap-highlight-color:transparent;background:var(--bg);color:var(--ink);font:400 17px/1.4 Barlow,system-ui,sans-serif}
 h1{font:700 34px/1.05 'Barlow Condensed',system-ui,sans-serif;margin:8px 0 12px}
 .demo{background:var(--accent);padding:8px 12px;border-radius:10px;font-size:15px;margin-bottom:14px}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px}
 button{font:inherit;cursor:pointer}
-.tab{padding:10px;border:2px solid var(--blauw);background:transparent;color:var(--blauw);border-radius:12px;font-weight:600}
+.tab{padding:10px 4px;font-size:15px;border:2px solid var(--blauw);background:transparent;color:var(--blauw);border-radius:12px;font-weight:600}
 .tab[aria-selected=true]{background:var(--blauw);color:#fff}
 label{display:block;font-weight:600;margin:10px 0 4px}
 input{width:100%;font:inherit;padding:12px;border:2px solid var(--lijn);border-radius:12px;background:#fff;color:var(--ink)}
@@ -58,7 +58,15 @@ input{width:100%;font:inherit;padding:12px;border:2px solid var(--lijn);border-r
 .zelf summary{cursor:pointer;display:inline-block;padding:6px 10px;border-radius:8px;opacity:.75}
 .zelf form{text-align:left;margin-top:8px;background:#fff;border-radius:14px;padding:12px}
 select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);border-radius:12px;background:#fff;color:var(--ink)}
+.zdeel{margin-top:10px}
 .rij3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stelhulp{margin:12px 0 0;font-size:14px;color:var(--muted);line-height:1.5}
+.stelhulp b{color:var(--ink)}
+.stelhulp .nok{color:#9b1c1c}
+.reeksen{margin-top:10px;font-size:13px;color:var(--muted)}
+.reeksen summary{cursor:pointer}
+.reeksen ul{margin:6px 0 0;padding-left:18px}
+.ztot{margin:12px 0 0;font-weight:600;color:var(--ink)}
 .zelf small{display:block;margin-top:8px;color:var(--muted)}
 #keuze{margin:14px 0 0;font:700 26px/1.1 'Barlow Condensed',sans-serif}
 .acties{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
@@ -72,7 +80,8 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
 
 <div class="tabs" role="tablist">
   <button class="tab" role="tab" id="tab-nummer" aria-selected="true">Treinnummer</button>
-  <button class="tab" role="tab" id="tab-station" aria-selected="false">Station en tijd</button>
+  <button class="tab" role="tab" id="tab-station" aria-selected="false">Station</button>
+  <button class="tab" role="tab" id="tab-stel" aria-selected="false">Treinstel</button>
 </div>
 
 <form id="f-nummer">
@@ -90,6 +99,18 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
   <button class="knop" type="submit">Zoek treinen</button>
 </form>
 
+<form id="f-stel" hidden>
+  <label for="s1">Nummer van het treinstel (4 cijfers, staat in of op de trein)</label>
+  <div class="rij3">
+    <input id="s1" inputmode="numeric" maxlength="4" placeholder="7632" aria-label="Treinstel 1">
+    <input id="s2" inputmode="numeric" maxlength="4" placeholder="optioneel" aria-label="Treinstel 2 (optioneel)">
+    <input id="s3" inputmode="numeric" maxlength="4" placeholder="optioneel" aria-label="Treinstel 3 (optioneel)">
+  </div>
+  <p class="stelhulp" id="stelhulp">Zit er een tweede treinstel aan vast? Vul dan ook het tweede nummer in.</p>
+  <button class="knop" type="submit">Toon trein</button>
+  <details class="reeksen"><summary>Welke nummers ken ik?</summary><ul id="reeksen"></ul></details>
+</form>
+
 <div id="melding" class="melding" role="alert" hidden></div>
 <ul id="treinen" class="lijst" hidden></ul>
 
@@ -98,15 +119,14 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
   <form id="f-zelf">
     <label for="z-type">Type trein</label>
     <select id="z-type"></select>
-    <div class="rij3" style="margin-top:10px">
-      <div><label for="z-d1">Deel 1</label><select id="z-d1"></select></div>
-      <div><label for="z-d2">Deel 2</label><select id="z-d2"></select></div>
-      <div><label for="z-d3">Deel 3</label><select id="z-d3"></select></div>
-    </div>
+    <div class="zdeel"><label for="z-d1">Deel 1</label><select id="z-d1"></select></div>
+    <div class="zdeel"><label for="z-d2">Deel 2</label><select id="z-d2"></select></div>
+    <div class="zdeel" id="z-w3"><label for="z-d3">Deel 3</label><select id="z-d3"></select></div>
+    <p class="ztot" id="z-tot"></p>
     <label for="z-nr" style="display:block;margin-top:10px">Treinnummer (mag leeg)</label>
     <input id="z-nr" inputmode="numeric" placeholder="bijv. 2150">
     <button class="knop" type="submit">Toon deze trein</button>
-    <small>Bij aantallen waar ik geen plaatje van heb, staat "getekend" en zie je een getekende bak.</small>
+    <small id="z-uitleg"></small>
   </form>
 </details>
 
@@ -211,32 +231,40 @@ async function toonTrein(nr, meta = {}) {
 }
 
 let baklijst = []; // alle bakken in getoonde volgorde
+// Als er geen heel plaatje is voor dit aantal bakken: voorste bak + middenbakken + achterste bak uit het grootste plaatje van dit type.
+function samenstellen(type, n) {
+  const basis = PLAATJES.filter(p => p.type.test(type)).sort((x, y) => y.n - x.n)[0];
+  if (!basis || n < 2 || basis.n < 3) return null;
+  const gr = basis.grenzen, tot = gr[gr.length - 1], src = "plaatjes/" + basis.bestand;
+  const bak = i => ({src, f0: gr[i] / tot, f1: gr[i + 1] / tot});
+  const midden = []; for (let i = 0; i < n - 2; i++) midden.push(bak(1 + i % (basis.n - 2)));
+  return [bak(0), ...midden, bak(basis.n - 1)];
+}
+// Geeft voor een treindeel de lijst stukjes {src, f0, f1}: één per bak, van voor naar achter.
+function stukkenVan(d) {
+  const uitPlaatje = (src, gewichten) => { const som = gewichten.reduce((p, q) => p + q, 0); let acc = 0; return gewichten.map(g => { const st = {src, f0: acc / som, f1: (acc + g) / som}; acc += g; return st; }); };
+  if (d.img && !DEMO) { laadPlaatje(d.img); const src = bronCache.get(d.img); if (src) return uitPlaatje(src, d.breedtes); }
+  const l = zoekPlaatje(d.type, d.n);
+  if (l) return uitPlaatje("plaatjes/" + l.bestand, l.breedtes);
+  const sam = samenstellen(d.type, d.n);
+  if (sam) return sam;
+  return uitPlaatje("data:image/svg+xml," + encodeURIComponent(svgSet(d.type, d.n)), Array(d.n).fill(1));
+}
 function tekenKaart() {
   const totaal = trein.delen.reduce((s, d) => s + d.n, 0);
   $("k-titel").textContent = titel();
-  $("k-sub").textContent = `${info.tijd ? fmt(info.tijd) + (info.spoor ? ", spoor " + info.spoor + ". " : ". ") : ""}${trein.delen[0].type}, ${trein.delen.length} ${trein.delen.length === 1 ? "deel" : "delen"}, ${totaal} bakken`;
-  let delen = trein.delen.map(d => {
-    let src = null, gewichten = d.breedtes;
-    if (d.img && !DEMO) { laadPlaatje(d.img); src = bronCache.get(d.img); }
-    if (!src) {
-      const l = zoekPlaatje(d.type, d.n);
-      if (l) { src = "plaatjes/" + l.bestand; gewichten = l.breedtes; }
-      else { src = "data:image/svg+xml," + encodeURIComponent(svgSet(d.type, d.n)); gewichten = Array(d.n).fill(1); }
-    }
-    const som = gewichten.reduce((a, b) => a + b, 0); let acc = 0;
-    const bakken = gewichten.map(g => { const f = [acc / som, (acc + g) / som]; acc += g; return f; });
-    return {type: d.type, src, bakken};
-  });
-  if (omgekeerd) { delen.reverse(); delen.forEach(d => d.bakken.reverse()); }
+  $("k-sub").textContent = `${info.tijd ? fmt(info.tijd) + (info.spoor ? ", spoor " + info.spoor + ". " : ". ") : ""}${trein.delen.every(d => d.naam) ? trein.delen.map(d => d.naam).join(" + ") : trein.delen[0].type}, ${trein.delen.length} ${trein.delen.length === 1 ? "deel" : "delen"}, ${totaal} bakken`;
+  let delen = trein.delen.map(d => ({type: d.type, naam: d.naam, nummer: d.nummer, stukken: stukkenVan(d)}));
+  if (omgekeerd) { delen.reverse(); delen.forEach(d => d.stukken.reverse()); }
   const box = $("bakken"); box.replaceChildren();
   baklijst = [];
   delen.forEach((d, di) => {
-    box.append(h("div", {className: "deelnaam", textContent: `${d.type}, deel ${di + 1}`}));
-    d.bakken.forEach(([f0, f1]) => {
+    box.append(h("div", {className: "deelnaam", textContent: d.naam ? `Deel ${di + 1}: ${d.naam}${d.nummer ? " (" + d.nummer + ")" : ""}` : `${d.type}, deel ${di + 1}`}));
+    d.stukken.forEach(st => {
       const nr = baklijst.length + 1;
-      baklijst.push({nr, deelnr: di, src: d.src, f0, f1, type: d.type});
+      baklijst.push({nr, deelnr: di, src: st.src, f0: st.f0, f1: st.f1, type: d.type, naam: d.naam, nummer: d.nummer});
       const vlak = h("div", {className: "vlak", role: "button", tabIndex: 0, ariaLabel: `Bak ${nr}. Tik op de plek waar je zit.`});
-      vlak.append(knip(d.src, f0, f1, omgekeerd));
+      vlak.append(knip(st.src, st.f0, st.f1, omgekeerd));
       vlak.onclick = e => {
         const r = vlak.firstElementChild.getBoundingClientRect();
         keuze = {bak: nr, x: Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), y: Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))};
@@ -331,8 +359,11 @@ async function maakDeelplaatje() {
     let bx = sx0;
     perDeel.forEach(deel => {
       const w = deel.length * bw + gap * (deel.length - 1), x0 = bx, x1 = bx + w, by = y + 8, ty = by - 12;
-      const label = `DEEL ${deel[0].deelnr + 1}  ·  ${deel.length} BAKKEN`;
-      c.font = `600 21px ${tekst}`; const tw = c.measureText(label).width, cx = (x0 + x1) / 2;
+      c.font = `600 21px ${tekst}`;
+      const dn = deel[0].deelnr + 1, nm = deel[0].naam ? `${deel[0].naam}${deel[0].nummer ? " " + deel[0].nummer : ""}` : "";
+      const opties = [nm && `DEEL ${dn}  ·  ${nm}`, nm && `${nm}`, `DEEL ${dn}  ·  ${deel.length} BAKKEN`, `DEEL ${dn}`].filter(Boolean);
+      let label = opties.find(t => c.measureText(t).width + 70 <= w) || opties[opties.length - 1];
+      const tw = c.measureText(label).width, cx = (x0 + x1) / 2;
       c.strokeStyle = "rgba(255,255,255,.55)"; c.lineWidth = 3; c.lineCap = "round"; c.lineJoin = "round";
       c.beginPath(); c.moveTo(x0 + 2, by + 26); c.lineTo(x0 + 2, by + 14); c.arcTo(x0 + 2, by, x0 + 16, by, 14); c.lineTo(cx - tw / 2 - 14, by); c.stroke();
       c.beginPath(); c.moveTo(cx + tw / 2 + 14, by); c.lineTo(x1 - 16, by); c.arcTo(x1 - 2, by, x1 - 2, by + 14, 14); c.lineTo(x1 - 2, by + 26); c.stroke();
@@ -420,32 +451,47 @@ function svgSet(type, n) {
 }
 
 // ====== ZELF EEN TREIN SAMENSTELLEN ======
-const ZELF = [["ICNG", "ICNG (Intercity)", 8], ["FLIRT", "SNG / FLIRT (Sprinter)", 4], ["DDZ", "DDZ (Dubbeldekker)", 6], ["VIRM", "VIRM (Intercity)", 6]];
+// Alleen echte treinstellen: maten = aantal bakken per stel, maxDelen = hoeveel stellen je aan elkaar mag koppelen.
+const ZELF = {
+  ICNG:  {naam: "ICNG (Intercity)",        maten: [5, 8], maxDelen: 2},
+  FLIRT: {naam: "SNG / FLIRT (Sprinter)",  maten: [3, 4], maxDelen: 3},
+  DDZ:   {naam: "DDZ (Dubbeldekker)",      maten: [4, 6], maxDelen: 2},
+  VIRM:  {naam: "VIRM (Intercity)",        maten: [4, 6], maxDelen: 3}
+};
 const ZELF_SLEUTEL = "treinplek-zelf";
 function zelfOpslaan(x) { try { localStorage.setItem(ZELF_SLEUTEL, JSON.stringify(x)); } catch (_) {} }
 function zelfLezen() { try { return JSON.parse(localStorage.getItem(ZELF_SLEUTEL)) || null; } catch (_) { return null; } }
-function zelfVulAantallen(waarden) {
-  const type = $("z-type").value;
+const zelfWaarden = () => ["z-d1", "z-d2", "z-d3"].map(id => Number($(id).value));
+function zelfTotaal() {
+  const delen = zelfWaarden().filter(n => n > 0), tot = delen.reduce((p, q) => p + q, 0);
+  $("z-tot").textContent = `Totaal: ${tot} bakken in ${delen.length} ${delen.length === 1 ? "deel" : "delen"}`;
+}
+function zelfVul(waarden) {
+  const z = ZELF[$("z-type").value];
   ["z-d1", "z-d2", "z-d3"].forEach((id, i) => {
     const sel = $(id); sel.replaceChildren();
     if (i > 0) sel.append(h("option", {value: "0", textContent: "geen"}));
-    for (let n = 2; n <= 12; n++) sel.append(h("option", {value: String(n), textContent: `${n} bakken${zoekPlaatje(type, n) ? "" : " (getekend)"}`}));
-    sel.value = String(waarden[i] || 0);
-    if (i === 0 && !waarden[0]) sel.value = "4";
+    z.maten.forEach(n => sel.append(h("option", {value: String(n), textContent: `${n} bakken: 1 voor, ${n - 2} midden, 1 achter`})));
+    const w = waarden[i];
+    sel.value = z.maten.includes(w) ? String(w) : (i === 0 ? String(z.maten[z.maten.length - 1]) : "0");
+    sel.onchange = zelfTotaal;
   });
+  $("z-w3").hidden = z.maxDelen < 3;
+  if (z.maxDelen < 3) $("z-d3").value = "0";
+  $("z-uitleg").textContent = `Alleen echte treinstellen: ${z.maten.join(" of ")} bakken per deel, hooguit ${z.maxDelen} delen aan elkaar. De bakken worden samengesteld uit de voorste, middelste en achterste bak van je plaatjes.`;
+  zelfTotaal();
 }
 (function zelfStart() {
-  ZELF.forEach(([w, naam]) => $("z-type").append(h("option", {value: w, textContent: naam})));
+  Object.entries(ZELF).forEach(([w, z]) => $("z-type").append(h("option", {value: w, textContent: z.naam})));
   const bewaard = zelfLezen();
-  if (bewaard && ZELF.some(z => z[0] === bewaard.type)) {
-    $("z-type").value = bewaard.type; zelfVulAantallen(bewaard.delen || []); $("z-nr").value = bewaard.nr || "";
-  } else zelfVulAantallen([ZELF[0][2]]);
-  $("z-type").onchange = () => zelfVulAantallen([ZELF.find(z => z[0] === $("z-type").value)[2]]);
+  if (bewaard && ZELF[bewaard.type]) { $("z-type").value = bewaard.type; zelfVul(bewaard.delen || []); $("z-nr").value = bewaard.nr || ""; }
+  else zelfVul([]);
+  $("z-type").onchange = () => zelfVul([]);
 })();
 $("f-zelf").onsubmit = e => {
   e.preventDefault(); melding("");
   const type = $("z-type").value, nr = $("z-nr").value.trim();
-  const delen = ["z-d1", "z-d2", "z-d3"].map(id => Number($(id).value)).filter(n => n > 0);
+  const delen = zelfWaarden().filter(n => n > 0);
   zelfOpslaan({type, delen, nr});
   trein = {delen: delen.map(n => ({type, n, img: null, breedtes: Array(n).fill(1)}))};
   info = {nr, soort: nr ? "Trein" : "Eigen trein"};
@@ -454,14 +500,57 @@ $("f-zelf").onsubmit = e => {
   tekenKaart(); $("kaart").scrollIntoView({behavior: "smooth"});
 };
 
+// ====== TREINSTELNUMMERS ======
+// Het nummer van een treinstel hoort altijd bij hetzelfde type en aantal bakken. [van, tot, type voor het plaatje, bakken, naam]
+const STELLEN = [
+  [2201, 2299, "FLIRT", 3, "FLIRT-3"], [2501, 2599, "FLIRT", 4, "FLIRT-4"],
+  [2301, 2399, "FLIRT", 3, "SNG-3"],   [3001, 3099, "FLIRT", 3, "SNG-3"], [2701, 2799, "FLIRT", 4, "SNG-4"],
+  [3101, 3199, "ICNG", 5, "ICNG-5"],   [3201, 3399, "ICNG", 8, "ICNG-8"],
+  [7501, 7599, "DDZ", 4, "DDZ-4"],     [7601, 7699, "DDZ", 6, "DDZ-6"],
+  [9401, 9599, "VIRM", 4, "VIRM-4"],   [8601, 8799, "VIRM", 6, "VIRM-6"]
+];
+function zoekStel(nr) {
+  const n = Number(nr), r = STELLEN.find(x => n >= x[0] && n <= x[1]);
+  return r && {type: r[2], n: r[3], naam: r[4], nummer: String(nr)};
+}
+(function () {
+  $("reeksen").append(...STELLEN.map(r => h("li", {textContent: `${r[0]} t/m ${r[1]}: ${r[4]} (${r[3]} bakken)`})));
+})();
+function stelWaarden() { return ["s1", "s2", "s3"].map(id => $(id).value.trim()).filter(Boolean); }
+function stelHulp() {
+  const w = stelWaarden(), el = $("stelhulp");
+  if (!w.length) { el.textContent = "Zit er een tweede treinstel aan vast? Vul dan ook het tweede nummer in."; return; }
+  el.replaceChildren(...w.flatMap((x, i) => {
+    const st = /^\d{4}$/.test(x) && zoekStel(x);
+    return [h("div", {}, ...(st ? [h("b", {textContent: x}), ` is een ${st.naam}, ${st.n} bakken.`] : [h("b", {textContent: x}), h("span", {className: "nok", textContent: " ken ik niet."})]))];
+  }));
+}
+["s1", "s2", "s3"].forEach(id => $(id).addEventListener("input", stelHulp));
+$("f-stel").onsubmit = e => {
+  e.preventDefault(); melding("");
+  const w = stelWaarden();
+  if (!w.length) return melding("Vul het nummer van het treinstel in.");
+  const delen = [];
+  for (const x of w) {
+    const st = /^\d{4}$/.test(x) && zoekStel(x);
+    if (!st) return melding(`Het nummer ${x} ken ik nog niet. Gebruik het nummer van 4 cijfers van het treinstel, bijvoorbeeld 7632 (ICNG, SNG, FLIRT, DDZ of VIRM).`);
+    delen.push({type: st.type, naam: st.naam, nummer: st.nummer, n: st.n, img: null, breedtes: Array(st.n).fill(1)});
+  }
+  trein = {delen};
+  info = {nr: w.join(" + "), soort: w.length > 1 ? "Treinstellen" : "Treinstel"};
+  omgekeerd = false; keuze = null;
+  $("treinen").hidden = true; $("zelf").hidden = true; $("kaart").hidden = false;
+  tekenKaart(); $("kaart").scrollIntoView({behavior: "smooth"});
+};
+
 // ====== EVENTS ======
 function tab(naam) {
-  $("tab-nummer").ariaSelected = String(naam === "nummer"); $("tab-station").ariaSelected = String(naam === "station");
-  $("f-nummer").hidden = naam !== "nummer"; $("f-station").hidden = naam !== "station";
+  for (const n of ["nummer", "station", "stel"]) { $("tab-" + n).ariaSelected = String(n === naam); $("f-" + n).hidden = n !== naam; }
   $("treinen").hidden = true; melding("");
 }
 $("tab-nummer").onclick = () => tab("nummer");
 $("tab-station").onclick = () => tab("station");
+$("tab-stel").onclick = () => tab("stel");
 
 $("f-nummer").onsubmit = e => { e.preventDefault(); toonTrein($("nummer").value.trim()); };
 
