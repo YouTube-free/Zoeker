@@ -54,6 +54,12 @@ input{width:100%;font:inherit;padding:12px;border:2px solid var(--lijn);border-r
 #overlay{position:fixed;inset:0;z-index:10;background:rgba(16,33,58,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;overflow:auto}
 #overlay img{max-width:100%;max-height:70vh;border-radius:12px;background:#fff}
 #overlay p{color:#fff;margin:0;text-align:center}
+.zelf{margin-top:30px;font-size:13px;color:var(--muted);text-align:center}
+.zelf summary{cursor:pointer;display:inline-block;padding:6px 10px;border-radius:8px;opacity:.75}
+.zelf form{text-align:left;margin-top:8px;background:#fff;border-radius:14px;padding:12px}
+select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);border-radius:12px;background:#fff;color:var(--ink)}
+.rij3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.zelf small{display:block;margin-top:8px;color:var(--muted)}
 #keuze{margin:14px 0 0;font:700 26px/1.1 'Barlow Condensed',sans-serif}
 .acties{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
 .acties .knop{margin:0}
@@ -86,6 +92,23 @@ input{width:100%;font:inherit;padding:12px;border:2px solid var(--lijn);border-r
 
 <div id="melding" class="melding" role="alert" hidden></div>
 <ul id="treinen" class="lijst" hidden></ul>
+
+<details id="zelf" class="zelf">
+  <summary>Zelf trein samenstellen</summary>
+  <form id="f-zelf">
+    <label for="z-type">Type trein</label>
+    <select id="z-type"></select>
+    <div class="rij3" style="margin-top:10px">
+      <div><label for="z-d1">Deel 1</label><select id="z-d1"></select></div>
+      <div><label for="z-d2">Deel 2</label><select id="z-d2"></select></div>
+      <div><label for="z-d3">Deel 3</label><select id="z-d3"></select></div>
+    </div>
+    <label for="z-nr" style="display:block;margin-top:10px">Treinnummer (mag leeg)</label>
+    <input id="z-nr" inputmode="numeric" placeholder="bijv. 2150">
+    <button class="knop" type="submit">Toon deze trein</button>
+    <small>Bij aantallen waar ik geen plaatje van heb, staat "getekend" en zie je een getekende bak.</small>
+  </form>
+</details>
 
 <section id="kaart" hidden aria-live="polite">
   <h2 id="k-titel"></h2>
@@ -173,6 +196,7 @@ function leesTrein(j) {
 
 // ====== ACTIES ======
 let trein = null, info = {}, omgekeerd = false, keuze = null;
+const titel = () => `${info.soort || "Trein"}${info.nr ? " " + info.nr : ""}${info.naar ? " naar " + info.naar : ""}`;
 
 async function toonTrein(nr, meta = {}) {
   melding(""); info = {nr, ...meta};
@@ -180,7 +204,7 @@ async function toonTrein(nr, meta = {}) {
     const t = DEMO ? demoTrein(Number(nr)) : leesTrein(await api(`/trein?nummer=${encodeURIComponent(nr)}`));
     if (!t.delen.length) { console.log("Geen bakken gevonden"); throw new Error("Geen samenstelling gevonden voor dit treinnummer. Het antwoord van NS heeft mogelijk een ander formaat."); }
     trein = t; omgekeerd = false; keuze = null;
-    $("treinen").hidden = true; $("kaart").hidden = false;
+    $("treinen").hidden = true; $("zelf").hidden = true; $("kaart").hidden = false;
     tekenKaart();
     $("kaart").scrollIntoView({behavior: "smooth"});
   } catch (e) { melding(e.message); }
@@ -189,7 +213,7 @@ async function toonTrein(nr, meta = {}) {
 let baklijst = []; // alle bakken in getoonde volgorde
 function tekenKaart() {
   const totaal = trein.delen.reduce((s, d) => s + d.n, 0);
-  $("k-titel").textContent = `${info.soort || "Trein"} ${info.nr}${info.naar ? " naar " + info.naar : ""}`;
+  $("k-titel").textContent = titel();
   $("k-sub").textContent = `${info.tijd ? fmt(info.tijd) + (info.spoor ? ", spoor " + info.spoor + ". " : ". ") : ""}${trein.delen[0].type}, ${trein.delen.length} ${trein.delen.length === 1 ? "deel" : "delen"}, ${totaal} bakken`;
   let delen = trein.delen.map(d => {
     let src = null, gewichten = d.breedtes;
@@ -275,7 +299,7 @@ async function maakDeelplaatje() {
   const bw = Math.min(130, (IW - gap * (totaal - perDeel.length) - deelgap * (perDeel.length - 1)) / totaal);
   const stripB = totaal * bw + gap * (totaal - perDeel.length) + deelgap * (perDeel.length - 1);
   const sx0 = P + (IW - stripB) / 2, sx1 = sx0 + stripB;
-  const sub = [`${info.soort || "Trein"} ${info.nr}${info.naar ? " naar " + info.naar : ""}`, info.tijd ? `${fmt(info.tijd)}${info.spoor ? ", spoor " + info.spoor : ""}` : ""].filter(Boolean);
+  const sub = [titel(), info.tijd ? `${fmt(info.tijd)}${info.spoor ? ", spoor " + info.spoor : ""}` : ""].filter(Boolean);
   const H = 60 + 98 + 60 + sub.length * 44 + 28 + 36 + 16 + (meer ? 52 : 0) + BLH + 60 + bh + 24 + 14 + 40 + 36 + 26 + 56;
   const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
   const c = cv.getContext("2d");
@@ -395,6 +419,41 @@ function svgSet(type, n) {
   return `<svg viewBox="0 0 ${n*110+4} 62" width="${n*110+4}" height="62" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${type}">${g}</svg>`;
 }
 
+// ====== ZELF EEN TREIN SAMENSTELLEN ======
+const ZELF = [["ICNG", "ICNG (Intercity)", 8], ["FLIRT", "SNG / FLIRT (Sprinter)", 4], ["DDZ", "DDZ (Dubbeldekker)", 6], ["VIRM", "VIRM (Intercity)", 6]];
+const ZELF_SLEUTEL = "treinplek-zelf";
+function zelfOpslaan(x) { try { localStorage.setItem(ZELF_SLEUTEL, JSON.stringify(x)); } catch (_) {} }
+function zelfLezen() { try { return JSON.parse(localStorage.getItem(ZELF_SLEUTEL)) || null; } catch (_) { return null; } }
+function zelfVulAantallen(waarden) {
+  const type = $("z-type").value;
+  ["z-d1", "z-d2", "z-d3"].forEach((id, i) => {
+    const sel = $(id); sel.replaceChildren();
+    if (i > 0) sel.append(h("option", {value: "0", textContent: "geen"}));
+    for (let n = 2; n <= 12; n++) sel.append(h("option", {value: String(n), textContent: `${n} bakken${zoekPlaatje(type, n) ? "" : " (getekend)"}`}));
+    sel.value = String(waarden[i] || 0);
+    if (i === 0 && !waarden[0]) sel.value = "4";
+  });
+}
+(function zelfStart() {
+  ZELF.forEach(([w, naam]) => $("z-type").append(h("option", {value: w, textContent: naam})));
+  const bewaard = zelfLezen();
+  if (bewaard && ZELF.some(z => z[0] === bewaard.type)) {
+    $("z-type").value = bewaard.type; zelfVulAantallen(bewaard.delen || []); $("z-nr").value = bewaard.nr || "";
+  } else zelfVulAantallen([ZELF[0][2]]);
+  $("z-type").onchange = () => zelfVulAantallen([ZELF.find(z => z[0] === $("z-type").value)[2]]);
+})();
+$("f-zelf").onsubmit = e => {
+  e.preventDefault(); melding("");
+  const type = $("z-type").value, nr = $("z-nr").value.trim();
+  const delen = ["z-d1", "z-d2", "z-d3"].map(id => Number($(id).value)).filter(n => n > 0);
+  zelfOpslaan({type, delen, nr});
+  trein = {delen: delen.map(n => ({type, n, img: null, breedtes: Array(n).fill(1)}))};
+  info = {nr, soort: nr ? "Trein" : "Eigen trein"};
+  omgekeerd = false; keuze = null;
+  $("treinen").hidden = true; $("zelf").hidden = true; $("kaart").hidden = false;
+  tekenKaart(); $("kaart").scrollIntoView({behavior: "smooth"});
+};
+
 // ====== EVENTS ======
 function tab(naam) {
   $("tab-nummer").ariaSelected = String(naam === "nummer"); $("tab-station").ariaSelected = String(naam === "station");
@@ -429,11 +488,11 @@ $("f-station").onsubmit = async e => {
 };
 
 $("draai").onclick = () => { omgekeerd = !omgekeerd; keuze = null; tekenKaart(); };
-$("terug").onclick = () => { $("kaart").hidden = true; keuze = null; if (!$("f-station").hidden && $("treinen").children.length) $("treinen").hidden = false; window.scrollTo({top: 0, behavior: "smooth"}); };
+$("terug").onclick = () => { $("kaart").hidden = true; $("zelf").hidden = false; keuze = null; if (!$("f-station").hidden && $("treinen").children.length) $("treinen").hidden = false; window.scrollTo({top: 0, behavior: "smooth"}); };
 $("deel").onclick = async () => {
   if (!keuze) return melding("Tik eerst op je plek in de trein.");
   melding("");
-  const tekst = `${zin()} ${info.soort || "Trein"} ${info.nr}${info.naar ? " naar " + info.naar : ""}.`;
+  const tekst = `${zin()} ${titel()}.`;
   let blob;
   try { const cv = await maakDeelplaatje(); blob = await new Promise((ok, fout) => cv.toBlob(x => x ? ok(x) : fout(new Error("toBlob")), "image/png")); }
   catch (e) { console.warn(e); return deelTekst(tekst); }
