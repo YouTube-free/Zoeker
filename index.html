@@ -172,8 +172,12 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
     <button class="knop" id="deel">Deel mijn plek</button>
     <button class="tekst" id="draai">Draai trein om</button>
   </div>
+  <div class="acties" style="margin-top:8px">
+    <button class="tekst" id="bewaar" type="button">Bewaar foto</button>
+    <button class="tekst" id="tekstkopie" type="button">Kopieer tekst</button>
+  </div>
   <button class="tekst" id="terug" style="width:100%;margin-top:8px">Andere trein</button>
-  <p style="margin-top:12px;font-size:14px">Tik op Deel mijn plek om een overzichtelijk plaatje met je plek naar je vrienden te sturen.</p>
+  <p style="margin-top:12px;font-size:14px">Tik op Deel mijn plek om een plaatje met je plek te sturen. Lukt het niet in Snapchat? Tik op Bewaar foto en kies hem daarna in Snapchat uit je rolletje.</p>
 </section>
 
 <script>
@@ -332,6 +336,7 @@ function tekenKaart() {
 }
 // Zet de rode cirkel op de gekozen plek, zonder alles opnieuw te tekenen.
 function werkBij() {
+  bereidFotoVoor();
   document.querySelectorAll(".stip").forEach(e => e.remove());
   document.querySelectorAll(".bak").forEach(e => e.classList.remove("gekozen"));
   if (!keuze) { $("keuze").textContent = "Tik op de plek in de trein waar je zit."; return; }
@@ -383,11 +388,13 @@ async function maakDeelplaatje() {
   const sx0 = P + (IW - stripB) / 2, sx1 = sx0 + stripB;
   const sub = [titel(), info.tijd ? `${fmt(info.tijd)}${info.spoor ? ", spoor " + info.spoor : ""}` : ""].filter(Boolean);
   const H = 60 + 98 + 60 + sub.length * 44 + 28 + 36 + 16 + (meer ? 52 : 0) + BLH + 60 + bh + 24 + 14 + 40 + 36 + 26 + 56;
-  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const H2 = Math.max(H, 1920), off = Math.round((H2 - H) / 2); // 9:16 is het formaat dat Snapchat verwacht
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H2;
   const c = cv.getContext("2d");
-  const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0d44a0"); g.addColorStop(1, "#08296a");
-  c.fillStyle = g; c.fillRect(0, 0, W, H);
+  const g = c.createLinearGradient(0, 0, 0, H2); g.addColorStop(0, "#0d44a0"); g.addColorStop(1, "#08296a");
+  c.fillStyle = g; c.fillRect(0, 0, W, H2);
   c.fillStyle = GEEL; c.fillRect(0, 0, W, 14);
+  c.translate(0, off);
   c.textBaseline = "top"; c.textAlign = "left";
   let y = 60;
   c.fillStyle = "#fff"; c.font = `700 92px ${kop}`; c.fillText(`Ik zit in bak ${keuze.bak}`, P, y); y += 98;
@@ -792,26 +799,47 @@ $("f-station").onsubmit = async e => {
 
 $("draai").onclick = () => { omgekeerd = !omgekeerd; keuze = null; tekenKaart(); };
 $("terug").onclick = () => { $("kaart").hidden = true; $("zelf").hidden = false; keuze = null; if (!$("f-station").hidden && $("treinen").children.length) $("treinen").hidden = false; window.scrollTo({top: 0, behavior: "smooth"}); };
+// De foto wordt al gemaakt zodra je een plek kiest. Telefoons laten delen alleen toe direct na je tik, dus daar mag niets meer op gewacht worden.
+let fotoKlaar = null, fotoGeld = 0;
+async function fotoBlobMaken() {
+  const cv = await maakDeelplaatje();
+  return new Promise((ok, fout) => cv.toBlob(x => x ? ok(x) : fout(new Error("toBlob")), "image/jpeg", 0.92));
+}
+function bereidFotoVoor() {
+  fotoKlaar = null;
+  if (!keuze) return;
+  const id = ++fotoGeld;
+  setTimeout(() => { if (id === fotoGeld) fotoBlobMaken().then(b => { if (id === fotoGeld) fotoKlaar = b; }).catch(e => console.warn(e)); }, 250);
+}
+const deelZin = () => `${zin()} ${titel()}.`;
 $("deel").onclick = async () => {
   if (!keuze) return melding("Tik eerst op je plek in de trein.");
   melding("");
-  const tekst = `${zin()} ${titel()}.`;
-  let blob;
-  try { const cv = await maakDeelplaatje(); blob = await new Promise((ok, fout) => cv.toBlob(x => x ? ok(x) : fout(new Error("toBlob")), "image/png")); }
-  catch (e) { console.warn(e); return deelTekst(tekst); }
-  const file = new File([blob], `treinplek-bak-${keuze.bak}.png`, {type: "image/png"});
+  let blob = fotoKlaar;
+  if (!blob) { try { blob = await fotoBlobMaken(); } catch (e) { console.warn(e); return deelTekst(deelZin()); } }
+  const file = new File([blob], "treinplek.jpg", {type: "image/jpeg"});
   try {
-    if (navigator.canShare && navigator.canShare({files: [file]})) { await navigator.share({files: [file], text: tekst}); return; }
+    // Alleen het plaatje, zonder tekst: de tekst staat al in het plaatje. Apps zoals Snapchat verslikken zich soms in plaatje + tekst tegelijk.
+    if (navigator.canShare && navigator.canShare({files: [file]})) { await navigator.share({files: [file]}); return; }
   } catch (e) { if (e.name === "AbortError") return; console.warn(e); }
-  toonOverlay(URL.createObjectURL(blob), tekst);
+  toonOverlay(URL.createObjectURL(blob), deelZin());
+};
+$("bewaar").onclick = async () => {
+  if (!keuze) return melding("Tik eerst op je plek in de trein.");
+  try { toonOverlay(URL.createObjectURL(fotoKlaar || await fotoBlobMaken()), deelZin()); } catch (e) { melding("De foto maken lukte niet."); }
+};
+$("tekstkopie").onclick = async () => {
+  if (!keuze) return melding("Tik eerst op je plek in de trein.");
+  try { await navigator.clipboard.writeText(deelZin()); melding("Tekst gekopieerd. Plak hem in je chat."); } catch (_) { melding(deelZin()); }
 };
 async function deelTekst(tekst) {
   try { if (navigator.share) await navigator.share({text: tekst}); else { await navigator.clipboard.writeText(tekst); melding("Tekst gekopieerd."); } } catch (_) {}
 }
 function toonOverlay(url, tekst) {
   const o = h("div", {id: "overlay"},
-    h("p", {textContent: "Houd je vinger op het plaatje en kies Bewaar of Deel."}),
+    h("p", {textContent: "Houd je vinger op het plaatje en kies Bewaar. Open daarna Snapchat en kies hem uit je rolletje."}),
     h("img", {src: url, alt: tekst}),
+    h("a", {className: "knop", href: url, download: "treinplek.jpg", textContent: "Opslaan als bestand", style: "max-width:300px;text-align:center;text-decoration:none;margin:0"}),
     h("button", {className: "knop", type: "button", textContent: "Sluiten", style: "max-width:300px", onclick: () => o.remove()}));
   document.body.append(o);
 }
