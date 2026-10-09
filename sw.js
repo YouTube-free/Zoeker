@@ -1,9 +1,26 @@
 // Service worker: zorgt dat de app offline opent en plaatjes snel laden.
 // Verander VERSIE als je plaatjes vervangt met dezelfde bestandsnaam.
-const VERSIE = "trein-v2";
+const VERSIE = "trein-v3";
 const BESTANDEN = ["./", "index.html", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png",
-  "plaatjes/ddz-6.png", "plaatjes/ddz-4.png", "plaatjes/virm-6.png", "plaatjes/virm-6-nieuw.png",
-  "plaatjes/flirt-4.png", "plaatjes/flirt-3.png", "plaatjes/icng-8.png"];
+  "plaatjes/ddz-4.png",
+  "plaatjes/ddz-6.png",
+  "plaatjes/flirt-3.png",
+  "plaatjes/flirt-4.png",
+  "plaatjes/gtw_6_achterhoek.png",
+  "plaatjes/gtw_8_achterhoek.png",
+  "plaatjes/ice.png",
+  "plaatjes/icm_3.png",
+  "plaatjes/icng-8.png",
+  "plaatjes/icng_B_8.png",
+  "plaatjes/keolis_flirt3_blauwnet.png",
+  "plaatjes/lint41_arriva.png",
+  "plaatjes/slt_4.png",
+  "plaatjes/slt_6.png",
+  "plaatjes/sng_3.png",
+  "plaatjes/sng_4.png",
+  "plaatjes/virm-6-nieuw.png",
+  "plaatjes/virm-6-oud.png",
+  "plaatjes/virm-6.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSIE).then(c => c.addAll(BESTANDEN)).then(() => self.skipWaiting()));

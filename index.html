@@ -62,6 +62,8 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
 .rij3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .stelhulp{margin:12px 0 0;font-size:14px;color:var(--muted);line-height:1.5}
 .stelhulp b{color:var(--ink)}
+.stelrij{margin-bottom:10px}
+.stelrij select{display:block;margin-top:6px}
 .stelhulp .nok{color:#9b1c1c}
 .reeksen{margin-top:10px;font-size:13px;color:var(--muted)}
 .reeksen summary{cursor:pointer}
@@ -100,7 +102,7 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
 </form>
 
 <form id="f-stel" hidden>
-  <label for="s1">Nummer van het treinstel (4 cijfers, staat in of op de trein)</label>
+  <label for="s1">Nummer van het treinstel (staat in of op de trein)</label>
   <div class="rij3">
     <input id="s1" inputmode="numeric" maxlength="4" placeholder="7632" aria-label="Treinstel 1">
     <input id="s2" inputmode="numeric" maxlength="4" placeholder="optioneel" aria-label="Treinstel 2 (optioneel)">
@@ -165,23 +167,37 @@ function isoMetOffset(d) {
 function melding(tekst) { $("melding").textContent = tekst || ""; $("melding").hidden = !tekst; }
 
 // ====== EIGEN PLAATJES (map plaatjes/) ======
-// grenzen = pixelpositie van het begin van elke bak plus het eind van het plaatje. type = herkenning op de typenaam van NS.
+// segmenten = per bak [begin, eind] in pixels, van voor naar achter (bij de GTW valt het groene middenstuk er tussenuit).
+// type  = herkenning op de typenaam van NS (treinnummer/station). /^$/ = nooit, alleen via treinstelnummer.
+// groep + variant = voor opzoeken op treinstelnummer (variant: standaard, oud of flow).
+const seg = g => g.slice(1).map((x, i) => [g[i], x]);
+const VIRM_G = [0, 570, 1122, 1687, 2254, 2806, 3376], ICNG_G = [0, 489, 875, 1260, 1720, 2177, 2562, 2948, 3442];
 const PLAATJES = [
-  {bestand: "ddz-6.png",        type: /DDZ/,      n: 6, grenzen: [0, 558, 1110, 1662, 2214, 2766, 3215]},
-  {bestand: "ddz-4.png",        type: /DDZ/,      n: 4, grenzen: [0, 558, 1110, 1662, 2111]},
-  {bestand: "virm-6.png",       type: /VIRM/,     n: 6, grenzen: [0, 570, 1122, 1687, 2254, 2806, 3376]},
-  {bestand: "virm-6-nieuw.png", type: /^$/,       n: 6, grenzen: [0, 570, 1122, 1687, 2254, 2806, 3376]}, // nieuwe stijl, nog niet gekoppeld
-  {bestand: "flirt-4.png",      type: /SNG|FLIRT/, n: 4, grenzen: [0, 475, 838, 1204, 1682]},
-  {bestand: "flirt-3.png",      type: /SNG|FLIRT/, n: 3, grenzen: [0, 475, 838, 1317]},
-  {bestand: "icng-8.png",       type: /ICNG/,     n: 8, grenzen: [0, 489, 875, 1260, 1720, 2177, 2562, 2948, 3442]}
+  {bestand: "ddz-6.png",        groep: "DDZ",   variant: "standaard", type: /DDZ/,   n: 6, breedte: 3215, segmenten: seg([0, 558, 1110, 1662, 2214, 2766, 3215])},
+  {bestand: "ddz-4.png",        groep: "DDZ",   variant: "standaard", type: /DDZ/,   n: 4, breedte: 2111, segmenten: seg([0, 558, 1110, 1662, 2111])},
+  {bestand: "virm-6.png",       groep: "VIRM",  variant: "standaard", type: /VIRM/,  n: 6, breedte: 3376, segmenten: seg(VIRM_G)},
+  {bestand: "virm-6-oud.png",   groep: "VIRM",  variant: "oud",       type: /^$/,    n: 6, breedte: 3376, segmenten: seg(VIRM_G)},
+  {bestand: "virm-6-nieuw.png", groep: "VIRM",  variant: "flow",      type: /^$/,    n: 6, breedte: 3376, segmenten: seg(VIRM_G)},
+  {bestand: "icng-8.png",       groep: "ICNG",  variant: "standaard", type: /ICNG/,  n: 8, breedte: 3442, segmenten: seg(ICNG_G)},
+  {bestand: "icng_B_8.png",     groep: "ICNG",  variant: "flow",      type: /^$/,    n: 8, breedte: 3442, segmenten: seg(ICNG_G)},
+  {bestand: "flirt-4.png",      groep: "FLIRT", variant: "standaard", type: /FLIRT/, n: 4, breedte: 1682, segmenten: seg([0, 475, 838, 1204, 1682])},
+  {bestand: "flirt-3.png",      groep: "FLIRT", variant: "standaard", type: /FLIRT/, n: 3, breedte: 1317, segmenten: seg([0, 475, 838, 1317])},
+  {bestand: "sng_4.png",        groep: "SNG",   variant: "standaard", type: /SNG/,   n: 4, breedte: 1580, segmenten: seg([0, 451, 790, 1128, 1580])},
+  {bestand: "sng_3.png",        groep: "SNG",   variant: "standaard", type: /SNG/,   n: 3, breedte: 1241, segmenten: seg([0, 451, 790, 1241])},
+  {bestand: "slt_6.png",        groep: "SLT",   variant: "standaard", type: /SLT/,   n: 6, breedte: 2094, segmenten: seg([0, 398, 722, 1046, 1370, 1694, 2094])},
+  {bestand: "slt_4.png",        groep: "SLT",   variant: "standaard", type: /SLT/,   n: 4, breedte: 1446, segmenten: seg([0, 398, 722, 1046, 1446])},
+  {bestand: "icm_3.png",        groep: "ICM",   variant: "standaard", type: /ICM/,   n: 3, breedte: 1662, segmenten: seg([0, 553, 1109, 1662])},
+  {bestand: "ice.png",          groep: "ICE",   variant: "standaard", type: /^ICE/,  n: 8, breedte: 4109, segmenten: seg([0, 548, 1051, 1556, 2061, 2566, 3071, 3576, 4109])},
+  {bestand: "keolis_flirt3_blauwnet.png", groep: "FLIRT-K", variant: "standaard", type: /^$/, n: 3, breedte: 1328, segmenten: seg([0, 482, 847, 1328])},
+  {bestand: "lint41_arriva.png", groep: "LINT", variant: "standaard", type: /LINT/, n: 2, breedte: 882, segmenten: seg([0, 441, 882])},
+  {bestand: "gtw_6_achterhoek.png", groep: "GTW", variant: "standaard", type: /GTW/, n: 2, breedte: 876,  segmenten: [[0, 403], [487, 876]]},
+  {bestand: "gtw_8_achterhoek.png", groep: "GTW", variant: "standaard", type: /GTW/, n: 3, breedte: 1190, segmenten: [[0, 402], [402, 717], [801, 1190]]}
 ];
-function zoekPlaatje(type, n) {
-  const m = PLAATJES.find(x => x.n === n && x.type.test(type));
-  return m && {bestand: m.bestand, breedtes: m.grenzen.slice(1).map((g, i) => g - m.grenzen[i])};
-}
+function zoekPlaatje(type, n) { return PLAATJES.find(x => x.n === n && x.type.test(type)) || null; }
+function zoekPlaatjeGroep(groep, variant, n) { return PLAATJES.find(x => x.groep === groep && x.variant === variant && x.n === n) || null; }
 
 // ====== DEMODATA (nep) ======
-const DEMO_TYPES = [{type:"ICNG", delen:[8]}, {type:"FLIRT", delen:[4,3]}, {type:"DDZ", delen:[6,4]}, {type:"VIRM", delen:[6]}];
+const DEMO_TYPES = [{type:"ICNG", delen:[8]}, {type:"SNG", delen:[4,3]}, {type:"DDZ", delen:[6,4]}, {type:"VIRM", delen:[6]}];
 const DEMO_NAAR = ["Zwolle","Eindhoven Centraal","Amsterdam Centraal","Arnhem Centraal","Rotterdam Centraal"];
 function demoVertrek(tijd) {
   const [u, m] = tijd.split(":").map(Number);
@@ -231,24 +247,30 @@ async function toonTrein(nr, meta = {}) {
 }
 
 let baklijst = []; // alle bakken in getoonde volgorde
+const uitSegmenten = l => l.segmenten.map(([x0, x1]) => ({src: "plaatjes/" + l.bestand, f0: x0 / l.breedte, f1: x1 / l.breedte}));
 // Als er geen heel plaatje is voor dit aantal bakken: voorste bak + middenbakken + achterste bak uit het grootste plaatje van dit type.
-function samenstellen(type, n) {
-  const basis = PLAATJES.filter(p => p.type.test(type)).sort((x, y) => y.n - x.n)[0];
+function samenstellen(d) {
+  const n = d.n;
+  let kand = d.groep ? PLAATJES.filter(p => p.groep === d.groep) : PLAATJES.filter(p => p.type.test(d.type));
+  if (d.groep && d.variant) { const v = kand.filter(p => p.variant === d.variant); if (v.length) kand = v; }
+  const basis = kand.sort((x, y) => y.n - x.n)[0];
   if (!basis || n < 2 || basis.n < 3) return null;
-  const gr = basis.grenzen, tot = gr[gr.length - 1], src = "plaatjes/" + basis.bestand;
-  const bak = i => ({src, f0: gr[i] / tot, f1: gr[i + 1] / tot});
-  const midden = []; for (let i = 0; i < n - 2; i++) midden.push(bak(1 + i % (basis.n - 2)));
-  return [bak(0), ...midden, bak(basis.n - 1)];
+  const st = uitSegmenten(basis);
+  const midden = []; for (let i = 0; i < n - 2; i++) midden.push(st[1 + i % (basis.n - 2)]);
+  return [st[0], ...midden, st[st.length - 1]];
 }
 // Geeft voor een treindeel de lijst stukjes {src, f0, f1}: één per bak, van voor naar achter.
 function stukkenVan(d) {
-  const uitPlaatje = (src, gewichten) => { const som = gewichten.reduce((p, q) => p + q, 0); let acc = 0; return gewichten.map(g => { const st = {src, f0: acc / som, f1: (acc + g) / som}; acc += g; return st; }); };
-  if (d.img && !DEMO) { laadPlaatje(d.img); const src = bronCache.get(d.img); if (src) return uitPlaatje(src, d.breedtes); }
-  const l = zoekPlaatje(d.type, d.n);
-  if (l) return uitPlaatje("plaatjes/" + l.bestand, l.breedtes);
-  const sam = samenstellen(d.type, d.n);
+  if (d.img && !DEMO) {
+    laadPlaatje(d.img); const src = bronCache.get(d.img);
+    if (src) { const som = d.breedtes.reduce((p, q) => p + q, 0); let acc = 0; return d.breedtes.map(g => { const st = {src, f0: acc / som, f1: (acc + g) / som}; acc += g; return st; }); }
+  }
+  const l = d.groep ? zoekPlaatjeGroep(d.groep, d.variant || "standaard", d.n) : zoekPlaatje(d.type, d.n);
+  if (l) return uitSegmenten(l);
+  const sam = samenstellen(d);
   if (sam) return sam;
-  return uitPlaatje("data:image/svg+xml," + encodeURIComponent(svgSet(d.type, d.n)), Array(d.n).fill(1));
+  const som = d.n;
+  return Array.from({length: d.n}, (_, i) => ({src: "data:image/svg+xml," + encodeURIComponent(svgSet(d.type, d.n)), f0: i / som, f1: (i + 1) / som}));
 }
 function tekenKaart() {
   const totaal = trein.delen.reduce((s, d) => s + d.n, 0);
@@ -453,10 +475,13 @@ function svgSet(type, n) {
 // ====== ZELF EEN TREIN SAMENSTELLEN ======
 // Alleen echte treinstellen: maten = aantal bakken per stel, maxDelen = hoeveel stellen je aan elkaar mag koppelen.
 const ZELF = {
-  ICNG:  {naam: "ICNG (Intercity)",        maten: [5, 8], maxDelen: 2},
-  FLIRT: {naam: "SNG / FLIRT (Sprinter)",  maten: [3, 4], maxDelen: 3},
-  DDZ:   {naam: "DDZ (Dubbeldekker)",      maten: [4, 6], maxDelen: 2},
-  VIRM:  {naam: "VIRM (Intercity)",        maten: [4, 6], maxDelen: 3}
+  ICNG:  {naam: "ICNG (Intercity)",          maten: [5, 8], maxDelen: 2},
+  FLIRT: {naam: "NS FLIRT (Sprinter)",       maten: [3, 4], maxDelen: 3},
+  SNG:   {naam: "SNG (Sprinter)",            maten: [3, 4], maxDelen: 3},
+  SLT:   {naam: "SLT (Sprinter)",            maten: [4, 6], maxDelen: 3},
+  DDZ:   {naam: "DDZ (Dubbeldekker)",        maten: [4, 6], maxDelen: 2},
+  VIRM:  {naam: "VIRM (Intercity)",          maten: [4, 6], maxDelen: 3},
+  ICM:   {naam: "ICM Koploper (Intercity)",  maten: [3, 4], maxDelen: 3}
 };
 const ZELF_SLEUTEL = "treinplek-zelf";
 function zelfOpslaan(x) { try { localStorage.setItem(ZELF_SLEUTEL, JSON.stringify(x)); } catch (_) {} }
@@ -501,28 +526,54 @@ $("f-zelf").onsubmit = e => {
 };
 
 // ====== TREINSTELNUMMERS ======
-// Het nummer van een treinstel hoort altijd bij hetzelfde type en aantal bakken. [van, tot, type voor het plaatje, bakken, naam]
+// Bron: Treinstelnummers_Nederland.xlsx. [van, tot, plaatjesgroep (null = nog geen plaatje), bakken, naam, standaardkleuring]
 const STELLEN = [
-  [2201, 2299, "FLIRT", 3, "FLIRT-3"], [2501, 2599, "FLIRT", 4, "FLIRT-4"],
-  [2301, 2399, "FLIRT", 3, "SNG-3"],   [3001, 3099, "FLIRT", 3, "SNG-3"], [2701, 2799, "FLIRT", 4, "SNG-4"],
-  [3101, 3199, "ICNG", 5, "ICNG-5"],   [3201, 3399, "ICNG", 8, "ICNG-8"],
-  [7501, 7599, "DDZ", 4, "DDZ-4"],     [7601, 7699, "DDZ", 6, "DDZ-6"],
-  [9401, 9599, "VIRM", 4, "VIRM-4"],   [8601, 8799, "VIRM", 6, "VIRM-6"]
+  [3101, 3149, "ICNG", 5, "ICNG-5"], [3201, 3227, "ICNG", 8, "ICNG-8"], [3301, 3321, "ICNG", 8, "ICNG-B", "flow"], [3351, 3362, "ICNG", 8, "ICNG-D"],
+  [4011, 4097, "ICM", 3, "ICMm-3 (Koploper)"], [4201, 4250, "ICM", 4, "ICMm-4 (Koploper)"],
+  [7501, 7550, "DDZ", 4, "DDZ-4"], [7601, 7650, "DDZ", 6, "DDZ-6"],
+  [8601, 8681, "VIRM", 6, "VIRM-6"], [8701, 8746, "VIRM", 6, "VIRM-6"], [9401, 9481, "VIRM", 4, "VIRM-4"], [9501, 9597, "VIRM", 4, "VIRM-4"],
+  [2201, 2233, "FLIRT", 3, "FLIRT-3"], [2501, 2525, "FLIRT", 4, "FLIRT-4"],
+  [2301, 2368, "SNG", 3, "SNG-3"], [2701, 2750, "SNG", 4, "SNG-4"], [3001, 3050, "SNG", 3, "SNG-3"],
+  [2401, 2469, "SLT", 4, "SLT-4"], [2601, 2662, "SLT", 6, "SLT-6"],
+  [2010, 2015, "FLIRT-K", 3, "FLIRT 3 (R-net)"], [501, 518, null, 2, "WINK (Arriva)"], [601, 618, null, 2, "WINK (Arriva)"],
+  [228, 251, "GTW", 2, "GTW 2/6 (Arriva)"], [301, 351, "GTW", 3, "GTW 2/8 (Arriva)"],
+  [450, 485, null, 3, "FLIRT (Arriva Limburg)"], [550, 585, null, 4, "FLIRT (Arriva Drielandentrein)"],
+  [7301, 7315, null, 3, "FLIRT/Protos (Valleilijn)"], [6301, 6315, "LINT", 2, "LINT 41 (Blauwnet)"],
+  [4331, 4332, null, 10, "TGV (Eurostar)"], [4300, 4300, null, 10, "TGV (Eurostar)"], [4651, 4654, "ICE", 8, "ICE 3M (uit dienst)"]
 ];
 function zoekStel(nr) {
   const n = Number(nr), r = STELLEN.find(x => n >= x[0] && n <= x[1]);
-  return r && {type: r[2], n: r[3], naam: r[4], nummer: String(nr)};
+  return r && {groep: r[2], n: r[3], naam: r[4], nummer: String(nr), variant: r[5] || "standaard"};
 }
+// Kleuring (standaard, oud, flow): alleen te kiezen als er meer plaatjes van dezelfde groep zijn. Je keuze per nummer wordt onthouden.
+const VARIANT_NAAM = {standaard: "Standaard", oud: "Oude kleuring (blauwe balk boven)", flow: "Nieuwe flow-stijl"};
+const VARIANT_KORT = {oud: "oude kleuring", flow: "flow-stijl"};
+const variantenVan = groep => ["standaard", "oud", "flow"].filter(v => PLAATJES.some(p => p.groep === groep && p.variant === v));
+const KLEUR_SLEUTEL = "treinplek-kleur";
+const kleurKaart = (() => { try { return JSON.parse(localStorage.getItem(KLEUR_SLEUTEL)) || {}; } catch (_) { return {}; } })();
+const kleurOpslaan = () => { try { localStorage.setItem(KLEUR_SLEUTEL, JSON.stringify(kleurKaart)); } catch (_) {} };
+const stelVariant = st => variantenVan(st.groep).includes(kleurKaart[st.nummer]) ? kleurKaart[st.nummer] : st.variant;
 (function () {
-  $("reeksen").append(...STELLEN.map(r => h("li", {textContent: `${r[0]} t/m ${r[1]}: ${r[4]} (${r[3]} bakken)`})));
+  $("reeksen").append(...STELLEN.map(r => h("li", {textContent: `${r[0]}${r[1] > r[0] ? " t/m " + r[1] : ""}: ${r[4]} (${r[3]} bakken)${r[2] ? "" : ", nog geen plaatje"}`})));
 })();
+const stelGeldig = x => /^\d{3,4}$/.test(x);
 function stelWaarden() { return ["s1", "s2", "s3"].map(id => $(id).value.trim()).filter(Boolean); }
 function stelHulp() {
   const w = stelWaarden(), el = $("stelhulp");
   if (!w.length) { el.textContent = "Zit er een tweede treinstel aan vast? Vul dan ook het tweede nummer in."; return; }
-  el.replaceChildren(...w.flatMap((x, i) => {
-    const st = /^\d{4}$/.test(x) && zoekStel(x);
-    return [h("div", {}, ...(st ? [h("b", {textContent: x}), ` is een ${st.naam}, ${st.n} bakken.`] : [h("b", {textContent: x}), h("span", {className: "nok", textContent: " ken ik niet."})]))];
+  el.replaceChildren(...w.map(x => {
+    const st = stelGeldig(x) && zoekStel(x);
+    if (!st) return h("div", {className: "stelrij"}, h("b", {textContent: x}), h("span", {className: "nok", textContent: " ken ik niet."}));
+    const rij = h("div", {className: "stelrij"}, h("b", {textContent: x}), ` is een ${st.naam}, ${st.n} bakken.`, ...(st.groep ? [] : [h("span", {className: "nok", textContent: " Geen plaatje."})]));
+    const v = st.groep ? variantenVan(st.groep) : [];
+    if (v.length > 1) {
+      const sel = h("select", {ariaLabel: `Kleuring van ${x}`});
+      v.forEach(k => sel.append(h("option", {value: k, textContent: VARIANT_NAAM[k]})));
+      sel.value = stelVariant(st);
+      sel.onchange = () => { kleurKaart[x] = sel.value; kleurOpslaan(); };
+      rij.append(sel);
+    }
+    return rij;
   }));
 }
 ["s1", "s2", "s3"].forEach(id => $(id).addEventListener("input", stelHulp));
@@ -532,9 +583,11 @@ $("f-stel").onsubmit = e => {
   if (!w.length) return melding("Vul het nummer van het treinstel in.");
   const delen = [];
   for (const x of w) {
-    const st = /^\d{4}$/.test(x) && zoekStel(x);
-    if (!st) return melding(`Het nummer ${x} ken ik nog niet. Gebruik het nummer van 4 cijfers van het treinstel, bijvoorbeeld 7632 (ICNG, SNG, FLIRT, DDZ of VIRM).`);
-    delen.push({type: st.type, naam: st.naam, nummer: st.nummer, n: st.n, img: null, breedtes: Array(st.n).fill(1)});
+    const st = stelGeldig(x) && zoekStel(x);
+    if (!st) return melding(`Het nummer ${x} ken ik niet. Gebruik het nummer van het hele treinstel (3 of 4 cijfers), bijvoorbeeld 7632.`);
+    if (!st.groep) return melding(`${x} is een ${st.naam} (${st.n} bakken), maar van dit type heb ik nog geen plaatje.`);
+    const v = stelVariant(st);
+    delen.push({type: st.groep, groep: st.groep, variant: v, naam: st.naam + (VARIANT_KORT[v] ? ` (${VARIANT_KORT[v]})` : ""), nummer: st.nummer, n: st.n, img: null, breedtes: Array(st.n).fill(1)});
   }
   trein = {delen};
   info = {nr: w.join(" + "), soort: w.length > 1 ? "Treinstellen" : "Treinstel"};
