@@ -176,8 +176,9 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
     <button class="tekst" id="bewaar" type="button">Bewaar foto</button>
     <button class="tekst" id="tekstkopie" type="button">Kopieer tekst</button>
   </div>
+  <a class="knop" id="snap" href="snapchat://" style="display:block;text-align:center;text-decoration:none;margin-top:8px;background:#fffc00;color:#10213a">Open Snapchat</a>
   <button class="tekst" id="terug" style="width:100%;margin-top:8px">Andere trein</button>
-  <p style="margin-top:12px;font-size:14px">Tik op Deel mijn plek om een plaatje met je plek te sturen. Lukt het niet in Snapchat? Tik op Bewaar foto en kies hem daarna in Snapchat uit je rolletje.</p>
+  <p style="margin-top:12px;font-size:14px">Tik op Deel mijn plek om een plaatje met je plek te sturen. Wil je rechtstreeks naar de Snapchat-app? Tik eerst op Bewaar foto, daarna op Open Snapchat en kies het plaatje uit je rolletje.</p>
 </section>
 
 <script>
@@ -811,6 +812,9 @@ function bereidFotoVoor() {
   const id = ++fotoGeld;
   setTimeout(() => { if (id === fotoGeld) fotoBlobMaken().then(b => { if (id === fotoGeld) fotoKlaar = b; }).catch(e => console.warn(e)); }, 250);
 }
+// Snapchat openen: iPhone gebruikt snapchat://, Android heeft een intent-adres nodig.
+const snapLink = () => /Android/i.test(navigator.userAgent) ? "intent://#Intent;scheme=snapchat;package=com.snapchat.android;end" : "snapchat://";
+$("snap").href = snapLink();
 const deelZin = () => `${zin()} ${titel()}.`;
 $("deel").onclick = async () => {
   if (!keuze) return melding("Tik eerst op je plek in de trein.");
@@ -840,6 +844,7 @@ function toonOverlay(url, tekst) {
     h("p", {textContent: "Houd je vinger op het plaatje en kies Bewaar. Open daarna Snapchat en kies hem uit je rolletje."}),
     h("img", {src: url, alt: tekst}),
     h("a", {className: "knop", href: url, download: "treinplek.jpg", textContent: "Opslaan als bestand", style: "max-width:300px;text-align:center;text-decoration:none;margin:0"}),
+    h("a", {className: "knop", href: snapLink(), textContent: "Open Snapchat", style: "max-width:300px;text-align:center;text-decoration:none;margin:0;background:#fffc00;color:#10213a"}),
     h("button", {className: "knop", type: "button", textContent: "Sluiten", style: "max-width:300px", onclick: () => o.remove()}));
   document.body.append(o);
 }
