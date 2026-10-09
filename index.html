@@ -20,9 +20,9 @@
 body{margin:0 auto;max-width:520px;padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));-webkit-tap-highlight-color:transparent;background:var(--bg);color:var(--ink);font:400 17px/1.4 Barlow,system-ui,sans-serif}
 h1{font:700 34px/1.05 'Barlow Condensed',system-ui,sans-serif;margin:8px 0 12px}
 .demo{background:var(--accent);padding:8px 12px;border-radius:10px;font-size:15px;margin-bottom:14px}
-.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 button{font:inherit;cursor:pointer}
-.tab{padding:10px 4px;font-size:15px;border:2px solid var(--blauw);background:transparent;color:var(--blauw);border-radius:12px;font-weight:600}
+.tab{min-height:48px;padding:10px 4px;font-size:16px;border:2px solid var(--blauw);background:transparent;color:var(--blauw);border-radius:12px;font-weight:600}
 .tab[aria-selected=true]{background:var(--blauw);color:#fff}
 label{display:block;font-weight:600;margin:10px 0 4px}
 input{width:100%;font:inherit;padding:12px;border:2px solid var(--lijn);border-radius:12px;background:#fff;color:var(--ink)}
@@ -74,19 +74,49 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
 .acties{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
 .acties .knop{margin:0}
 [hidden]{display:none!important}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.chip{min-height:48px;padding:10px 6px;border:2px solid var(--blauw);border-radius:12px;background:#fff;color:var(--blauw);font-weight:600}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--ink);color:var(--ink)}
+.lijst .sectie{margin-top:12px}
+.lijst .sectie b{display:block;font:700 22px/1.1 'Barlow Condensed',sans-serif}
+.lijst .sectie span{font-size:13px;color:var(--muted)}
+.lijst .leeg{color:var(--muted);padding:8px 2px}
+.lijst .tag{font:700 15px/1 'Barlow Condensed',sans-serif;padding:6px 8px;border-radius:8px;background:var(--blauw);color:#fff}
+.lijst .tag.SPR{background:#fff;color:var(--blauw);border:2px solid var(--blauw)}
+.lijst .laat{color:#9b1c1c;font-weight:600}
 </style>
 </head>
 <body>
 <h1>Waar zit ik in de trein?</h1>
-<div id="demo" class="demo" hidden>Demo met nepdata. Vul bovenin het script je Worker-URL in voor echte treinen.</div>
+<div id="demo" class="demo" hidden><b>Testversie.</b> Treinen, stations en locatie zijn nagebootst. Er is nog geen verbinding met NS. Treinnummer 0 t/m 9 aan het eind van het nummer geeft elk een ander type trein.</div>
 
 <div class="tabs" role="tablist">
-  <button class="tab" role="tab" id="tab-nummer" aria-selected="true">Treinnummer</button>
+  <button class="tab" role="tab" id="tab-auto" aria-selected="true">Automatisch</button>
+  <button class="tab" role="tab" id="tab-nummer" aria-selected="false">Treinnummer</button>
   <button class="tab" role="tab" id="tab-station" aria-selected="false">Station</button>
   <button class="tab" role="tab" id="tab-stel" aria-selected="false">Treinstel</button>
 </div>
 
-<form id="f-nummer">
+<div id="f-auto">
+  <p id="auto-status" class="stelhulp">Je locatie opzoeken…</p>
+  <p id="auto-hint" class="stelhulp" hidden>Je lijkt onderweg te zijn. Daarom zoeken we ook de dichtstbijzijnde IC-stop.</p>
+  <div class="chips" role="group" aria-label="Soort trein">
+    <button type="button" class="chip" data-f="alles" aria-pressed="true">Alles</button>
+    <button type="button" class="chip" data-f="IC" aria-pressed="false">IC</button>
+    <button type="button" class="chip" data-f="SPR" aria-pressed="false">SPR</button>
+  </div>
+  <div id="testplek-w" hidden>
+    <label for="testplek">Testplek (alleen in de testversie)</label>
+    <select id="testplek"></select>
+  </div>
+  <ul id="auto-lijst" class="lijst"></ul>
+  <div class="acties">
+    <button class="tekst" id="auto-nieuw" type="button">Opnieuw zoeken</button>
+    <button class="tekst" id="auto-station" type="button">Station kiezen</button>
+  </div>
+</div>
+
+<form id="f-nummer" hidden>
   <label for="nummer">Treinnummer (staat in de NS-app)</label>
   <input id="nummer" inputmode="numeric" placeholder="bijv. 2150" required>
   <button class="knop" type="submit">Toon trein</button>
@@ -197,7 +227,9 @@ function zoekPlaatje(type, n) { return PLAATJES.find(x => x.n === n && x.type.te
 function zoekPlaatjeGroep(groep, variant, n) { return PLAATJES.find(x => x.groep === groep && x.variant === variant && x.n === n) || null; }
 
 // ====== DEMODATA (nep) ======
-const DEMO_TYPES = [{type:"ICNG", delen:[8]}, {type:"SNG", delen:[4,3]}, {type:"DDZ", delen:[6,4]}, {type:"VIRM", delen:[6]}];
+// Testtreinen: het treinnummer bepaalt het type (nummer modulo 10), zo zie je alle plaatjes terug.
+const DEMO_TYPES = [{type:"ICNG", delen:[8]}, {type:"SNG", delen:[4,3]}, {type:"DDZ", delen:[6,4]}, {type:"VIRM", delen:[6]}, {type:"SLT", delen:[6,4]},
+  {type:"ICM", delen:[3,4]}, {type:"ICE", delen:[8]}, {type:"GTW", delen:[2,3]}, {type:"LINT", delen:[2]}, {type:"FLIRT", delen:[4,3]}];
 const DEMO_NAAR = ["Zwolle","Eindhoven Centraal","Amsterdam Centraal","Arnhem Centraal","Rotterdam Centraal"];
 function demoVertrek(tijd) {
   const [u, m] = tijd.split(":").map(Number);
@@ -539,7 +571,7 @@ const STELLEN = [
   [228, 251, "GTW", 2, "GTW 2/6 (Arriva)"], [301, 351, "GTW", 3, "GTW 2/8 (Arriva)"],
   [450, 485, null, 3, "FLIRT (Arriva Limburg)"], [550, 585, null, 4, "FLIRT (Arriva Drielandentrein)"],
   [7301, 7315, null, 3, "FLIRT/Protos (Valleilijn)"], [6301, 6315, "LINT", 2, "LINT 41 (Blauwnet)"],
-  [4331, 4332, null, 10, "TGV (Eurostar)"], [4300, 4300, null, 10, "TGV (Eurostar)"], [4651, 4654, "ICE", 8, "ICE 3M (uit dienst)"]
+  [4331, 4332, null, 10, "TGV (Eurostar)"], [4300, 4300, null, 10, "TGV (Eurostar)"], [4651, 4654, null, 8, "ICE 3M (uit dienst)"], [8001, 8090, "ICE", 8, "ICE 3neo"]
 ];
 function zoekStel(nr) {
   const n = Number(nr), r = STELLEN.find(x => n >= x[0] && n <= x[1]);
@@ -596,11 +628,140 @@ $("f-stel").onsubmit = e => {
   tekenKaart(); $("kaart").scrollIntoView({behavior: "smooth"});
 };
 
+// ====== AUTOMATISCH: TREINEN IN DE BUURT ======
+// [code, naam, breedte, lengte, IC-stop?] Alleen voor de demo. Echte stations komen van NS via de Worker (/stations).
+const DEMO_STATIONS = [["AH","Arnhem Centraal",51.9852,5.8987,1],["AHP","Arnhem Velperpoort",51.9873,5.9202,0],["OBK","Oosterbeek",51.9889,5.8468,0],["VP","Velp",51.9996,5.9742,0],
+  ["WF","Wolfheze",52.0051,5.7916,0],["EDE","Ede-Wageningen",52.0429,5.6652,1],["DR","Dieren",52.0502,6.1054,0],["ZP","Zutphen",52.1385,6.2002,1],
+  ["UT","Utrecht Centraal",52.0894,5.1100,1],["HT","Houten",52.0276,5.1700,0],["AMF","Amersfoort Centraal",52.1533,5.3739,1],["ASD","Amsterdam Centraal",52.3789,4.9004,1],
+  ["RTD","Rotterdam Centraal",51.9250,4.4690,1],["DT","Delft",52.0067,4.3563,0],["GVC","Den Haag Centraal",52.0809,4.3249,1],["ZL","Zwolle",52.5047,6.0914,1],["EHV","Eindhoven Centraal",51.4433,5.4813,1],["GN","Groningen",53.2105,6.5641,1]];
+const STATIONS_SLEUTEL = "treinplek-stations-v1";
+const IC_SOORTEN = /^(IC|ICD|ICE|THA|EST|ICB|ICL|TGV|NJ|ICK)/i;
+const treinGroep = c => IC_SOORTEN.test(c || "") ? "IC" : "SPR";
+let testPos = null, autoPos = null, autoWatch = null, autoFilter = "alles", autoSecties = [], autoBezig = false, autoTijd = 0;
+
+async function laadStationsGeo() {
+  if (DEMO) return DEMO_STATIONS.map(([code, naam, lat, lng, ic]) => ({code, naam, lat, lng, ic}));
+  try { const b = JSON.parse(localStorage.getItem(STATIONS_SLEUTEL)); if (b && b.length > 50) return b; } catch (_) {}
+  const j = await api("/stations");
+  const lijst = (j.payload || j || []).map(x => ({
+    code: (x.id && x.id.code) || x.code,
+    naam: (x.names && (x.names.long || x.names.medium)) || (x.namen && (x.namen.lang || x.namen.middel)) || x.naam,
+    lat: x.location ? x.location.lat : x.lat, lng: x.location ? x.location.lng : x.lng, land: x.country || x.land
+  })).filter(x => x.code && Number.isFinite(x.lat) && Number.isFinite(x.lng) && (!x.land || x.land === "NL"));
+  if (!lijst.length) throw new Error("Geen stations van NS gekregen (controleer de /stations route in de Worker).");
+  try { localStorage.setItem(STATIONS_SLEUTEL, JSON.stringify(lijst)); } catch (_) {}
+  return lijst;
+}
+function afstandKm(a, b) {
+  const r = Math.PI / 180, dLat = (b.lat - a.lat) * r, dLng = (b.lng - a.lng) * r;
+  return 12742 * Math.asin(Math.sqrt(Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLng / 2) ** 2));
+}
+function leesVertrekAuto(j) {
+  return ((j.payload || j).departures || []).map(d => {
+    const p = d.product || {}, soort = p.shortCategoryName || p.categoryCode || "";
+    return {nr: p.number, soort, naar: d.direction, tijd: d.actualDateTime || d.plannedDateTime, gepland: d.plannedDateTime,
+      spoor: d.actualTrack || d.plannedTrack, vervalt: !!d.cancelled, groep: treinGroep(p.categoryCode || soort)};
+  }).filter(t => t.nr);
+}
+function demoAuto(s) {
+  const nu = Date.now(), BEST = ["Zwolle","Eindhoven Centraal","Amsterdam Centraal","Rotterdam Centraal","Nijmegen","Leeuwarden","Schiphol Airport","Maastricht"];
+  const plan = s.ic ? [["IC",-6],["SPR",-2],["IC",4],["SPR",8],["ICE",12],["IC",19],["SPR",23]] : [["SPR",-5],["SPR",6],["SPR",21]];
+  return plan.map(([soort, min], i) => {
+    const t = new Date(nu + min * 60000).toISOString();
+    return {nr: String(2000 + (s.code.charCodeAt(0) * 7 + i * 113) % 7000), soort, naar: BEST[(i + s.code.length) % BEST.length], tijd: t, gepland: t, spoor: String(1 + i % 4), vervalt: false, groep: treinGroep(soort)};
+  });
+}
+async function vertrekkenVan(s) {
+  let rijen = DEMO ? demoAuto(s) : leesVertrekAuto(await api(`/vertrek?station=${encodeURIComponent(s.code)}&dateTime=${encodeURIComponent(isoMetOffset(new Date(Date.now() - 20 * 60000)))}&maxJourneys=40`));
+  const nu = Date.now();
+  rijen = rijen.filter(t => { const m = (new Date(t.tijd) - nu) / 60000; return m > -20 && m < 45; }).sort((x, y) => new Date(x.tijd) - new Date(y.tijd));
+  return {...s, rijen, heeftIC: rijen.some(t => t.groep === "IC"), heeftSPR: rijen.some(t => t.groep === "SPR")};
+}
+// Zoekt de 3 dichtstbijzijnde stations. Heeft geen van die een IC (of sprinter), dan wordt er verder weg gezocht (maximaal 10 stations).
+async function autoZoek() {
+  if (!autoPos || autoBezig) return;
+  autoBezig = true; melding("");
+  try {
+    $("auto-status").textContent = "Treinen in de buurt zoeken…";
+    const alle = (await laadStationsGeo()).map(x => ({...x, km: afstandKm(autoPos, x)})).sort((a, b) => a.km - b.km);
+    const secties = await Promise.all(alle.slice(0, 3).map(vertrekkenVan));
+    for (let i = 3; i < Math.min(alle.length, 10) && !(secties.some(x => x.heeftIC) && secties.some(x => x.heeftSPR)); i++) secties.push(await vertrekkenVan(alle[i]));
+    autoSecties = secties; autoTijd = Date.now(); tekenAuto();
+  } catch (e) { $("auto-status").textContent = ""; melding("Treinen zoeken lukte niet: " + e.message); }
+  autoBezig = false;
+}
+const wanneer = t => { const m = Math.round((new Date(t.tijd) - Date.now()) / 60000); return m < 0 ? `vertrok ${-m} min geleden` : m === 0 ? "vertrekt nu" : `over ${m} min`; };
+function tekenAuto() {
+  const F = autoFilter, eerste = autoSecties[0], icStop = autoSecties.find(x => x.heeftIC), sprStop = autoSecties.find(x => x.heeftSPR);
+  const toon = (F === "IC" ? [icStop] : F === "SPR" ? [sprStop] : [eerste, icStop !== eerste ? icStop : null]).filter(Boolean);
+  const lijst = $("auto-lijst"); lijst.replaceChildren();
+  $("auto-status").textContent = autoSecties.length ? "" : "Je locatie opzoeken…";
+  if (!toon.length) lijst.append(h("li", {className: "leeg", textContent: "Geen treinen gevonden in de buurt. Probeer het tabblad Station."}));
+  toon.forEach(sec => {
+    const label = F === "SPR" ? "Dichtstbijzijnde stop met sprinters" : (F === "IC" || sec !== eerste) ? "Dichtstbijzijnde IC-stop" : "Dichtstbijzijnde station";
+    const km = sec.km < 10 ? sec.km.toFixed(1).replace(".", ",") : Math.round(sec.km);
+    lijst.append(h("li", {className: "sectie"}, h("span", {textContent: label}), h("b", {textContent: `${sec.naam}, ${km} km`}),
+      ...(F === "alles" && sec === eerste && !sec.heeftIC ? [h("span", {textContent: "Hier stoppen geen intercity's, daarom staat de dichtstbijzijnde IC-stop hieronder."})] : [])));
+    const rijen = sec.rijen.filter(t => F === "alles" || t.groep === F).slice(0, 10);
+    if (!rijen.length) lijst.append(h("li", {className: "leeg", textContent: "Geen treinen in de komende 45 minuten."}));
+    rijen.forEach(t => {
+      const laat = t.gepland ? Math.round((new Date(t.tijd) - new Date(t.gepland)) / 60000) : 0;
+      lijst.append(h("li", {}, h("button", {type: "button", className: t.vervalt ? "vervalt" : "", onclick: () => toonTrein(t.nr, {soort: t.soort, naar: t.naar, tijd: t.tijd, spoor: t.spoor})},
+        h("span", {className: "t", textContent: fmt(t.tijd)}),
+        h("span", {}, `${t.soort} naar ${t.naar || "?"}`, h("small", {}, `${wanneer(t)}${t.spoor ? " · spoor " + t.spoor : ""} · trein ${t.nr}`, ...(laat > 0 ? [h("span", {className: "laat", textContent: ` · +${laat} min`})] : []))),
+        h("span", {className: "tag " + t.groep, textContent: t.soort}))));
+    });
+  });
+}
+function autoGeenLocatie(tekst) {
+  $("auto-status").textContent = tekst + " Kies zelf een station of een treinnummer.";
+  $("auto-lijst").replaceChildren();
+}
+function autoStart() {
+  if (autoWatch !== null) return;
+  if (!navigator.geolocation) return autoGeenLocatie("Dit toestel geeft geen locatie door.");
+  $("auto-status").textContent = "Je locatie opzoeken…";
+  autoWatch = navigator.geolocation.watchPosition(p => {
+    if (testPos) return;
+    const eerder = autoPos;
+    autoPos = {lat: p.coords.latitude, lng: p.coords.longitude};
+    $("auto-hint").hidden = !(p.coords.speed > 8); // meer dan ongeveer 30 km/u: waarschijnlijk in een trein
+    if (!eerder || (afstandKm(eerder, autoPos) > 1.5 && Date.now() - autoTijd > 20000)) autoZoek();
+  }, err => { autoWatch = null; autoGeenLocatie(err.code === 1 ? "Je hebt geen toegang tot je locatie gegeven." : "Je locatie kon niet bepaald worden."); },
+  {enableHighAccuracy: true, maximumAge: 10000, timeout: 20000});
+}
+setInterval(() => { if (!document.hidden && !$("f-auto").hidden && autoPos && Date.now() - autoTijd > 45000) autoZoek(); }, 15000);
+document.querySelectorAll(".chip").forEach(b => b.onclick = () => {
+  autoFilter = b.dataset.f;
+  document.querySelectorAll(".chip").forEach(c => c.ariaPressed = String(c === b));
+  tekenAuto();
+});
+// Testplek kiezen (alleen in de testversie): zo kun je thuis proberen hoe de lijst reageert op locatie en snelheid.
+const TESTPLEKKEN = [["Mijn echte locatie (GPS)"], ["Bij Oosterbeek (alleen sprinters)", 51.9889, 5.8468, 0], ["Bij Arnhem Centraal (IC-station)", 51.9852, 5.8987, 0],
+  ["Bij Utrecht Centraal", 52.0894, 5.1100, 0], ["In een IC bij Wolfheze (rijdend)", 52.0051, 5.7916, 28], ["In een trein bij Houten (rijdend)", 52.0276, 5.1700, 30],
+  ["Op de Veluwe, ver van een station", 52.10, 5.78, 0]];
+if (DEMO) {
+  $("testplek-w").hidden = false;
+  TESTPLEKKEN.forEach((t, i) => $("testplek").append(h("option", {value: String(i), textContent: t[0]})));
+  $("testplek").onchange = () => {
+    const t = TESTPLEKKEN[Number($("testplek").value)];
+    if (!t[1]) { // terug naar echte GPS
+      testPos = null; autoPos = null; autoSecties = []; $("auto-hint").hidden = true;
+      if (autoWatch !== null) navigator.geolocation.clearWatch(autoWatch);
+      autoWatch = null; autoStart(); return;
+    }
+    testPos = autoPos = {lat: t[1], lng: t[2]}; $("auto-hint").hidden = !(t[3] > 8); autoTijd = 0; autoZoek();
+  };
+}
+$("auto-nieuw").onclick = () => { if (autoPos) { autoTijd = 0; autoZoek(); } else { autoWatch = null; autoStart(); } };
+$("auto-station").onclick = () => tab("station");
+
 // ====== EVENTS ======
 function tab(naam) {
-  for (const n of ["nummer", "station", "stel"]) { $("tab-" + n).ariaSelected = String(n === naam); $("f-" + n).hidden = n !== naam; }
+  for (const n of ["auto", "nummer", "station", "stel"]) { $("tab-" + n).ariaSelected = String(n === naam); $("f-" + n).hidden = n !== naam; }
   $("treinen").hidden = true; melding("");
 }
+$("tab-auto").onclick = () => { tab("auto"); autoStart(); };
 $("tab-nummer").onclick = () => tab("nummer");
 $("tab-station").onclick = () => tab("station");
 $("tab-stel").onclick = () => tab("stel");
@@ -659,6 +820,7 @@ function toonOverlay(url, tekst) {
 STATIONS.forEach(s => $("stations").append(h("option", {value: s[0]})));
 const nu = new Date(); $("tijd").value = `${pad(nu.getHours())}:${pad(nu.getMinutes())}`;
 $("demo").hidden = !DEMO;
+tab("auto"); autoStart();
 if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(e => console.log("sw", e)));
 </script>
 </body>
