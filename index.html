@@ -127,6 +127,12 @@ html.rijdt,html.rijdt body{overflow-x:hidden}
 /* De trein onderaan staat er alleen als er niets anders op het scherm staat */
 body:has(#auto-lijst:not([hidden])) #treinlogo,body:has(#treinen:not([hidden])) #treinlogo,body:has(#kaart:not([hidden])) #treinlogo,body:has(#melding:not([hidden])) #treinlogo,
 body:has(#f-nummer:not([hidden])) #treinlogo,body:has(#f-station:not([hidden])) #treinlogo,body:has(#f-stel:not([hidden])) #treinlogo{display:none!important}
+.vlak{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+#loep{position:fixed;z-index:30;width:176px;height:176px;border-radius:50%;overflow:hidden;border:4px solid #fff;background:#eef3f9;box-shadow:0 8px 28px rgba(16,33,58,.5);pointer-events:none}
+#loep .loep-in{position:absolute;left:0;top:0;transform-origin:0 0}
+#loep .loep-ring{position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:20px solid #e4002b;background:rgba(255,255,255,.3);box-shadow:0 0 0 3px #fff,inset 0 0 0 3px #fff}
+#kaart .deel-melding{margin:12px 0 0;font-size:16px;padding:10px 12px;border-radius:12px;background:#fdecec;color:#9b1c1c;font-weight:700;text-align:center}
+#kaart .deel-melding.ok{background:#e6f4ea;color:#1e6b34}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -233,9 +239,10 @@ body:has(#f-nummer:not([hidden])) #treinlogo,body:has(#f-station:not([hidden])) 
 <section id="kaart" hidden aria-live="polite">
   <h2 id="k-titel"></h2>
   <p id="k-sub"></p>
-  <div class="kop">Voorkant van de trein bovenaan. Tik op de plek waar je zit. Klopt de richting niet? Tik op Draai trein om.</div>
+  <div class="kop">Voorkant van de trein bovenaan. Tik op de plek waar je zit. Wil je het precies? Houd je vinger ingedrukt en sleep: je ziet dan een vergrootglas. Klopt de richting niet? Tik op Draai trein om.</div>
   <div id="bakken"></div>
   <div id="keuze"></div>
+  <p id="deel-melding" class="deel-melding" role="alert" hidden></p>
   <div class="acties">
     <button class="knop" id="deel">Deel mijn plek</button>
     <button class="tekst" id="draai">Draai trein om</button>
@@ -261,6 +268,11 @@ const pad = n => String(n).padStart(2, "0");
 function isoMetOffset(d) {
   const o = -d.getTimezoneOffset(), s = o >= 0 ? "+" : "-";
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00${s}${pad(Math.floor(Math.abs(o)/60))}:${pad(Math.abs(o)%60)}`;
+}
+// Melding vlak boven de Deel-knop (niet bovenaan de pagina). Schudt even, tenzij animatie uit staat.
+function deelMelding(tekst, ok) {
+  const el = $("deel-melding"); el.textContent = tekst || ""; el.hidden = !tekst; el.classList.toggle("ok", !!ok);
+  if (tekst && !ok && !minderBeweging() && el.animate) el.animate([{transform: "translateX(0)"}, {transform: "translateX(-7px)"}, {transform: "translateX(7px)"}, {transform: "translateX(-4px)"}, {transform: "translateX(0)"}], {duration: 320});
 }
 function melding(tekst) { $("melding").textContent = tekst || ""; $("melding").hidden = !tekst; }
 
@@ -385,22 +397,68 @@ function tekenKaart() {
       baklijst.push({nr, deelnr: di, src: st.src, f0: st.f0, f1: st.f1, type: d.type, naam: d.naam, nummer: d.nummer});
       const vlak = h("div", {className: "vlak", role: "button", tabIndex: 0, ariaLabel: `Bak ${nr}. Tik op de plek waar je zit.`});
       vlak.append(knip(st.src, st.f0, st.f1, omgekeerd));
-      vlak.onclick = e => {
-        const r = vlak.firstElementChild.getBoundingClientRect();
-        keuze = {bak: nr, x: Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), y: Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))};
-        werkBij();
-      };
+      koppelPlaatsen(vlak, nr);
       vlak.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); keuze = {bak: nr, x: .5, y: .5}; werkBij(); } };
       box.append(h("div", {className: "bak", id: "bak" + nr}, h("div", {className: "baktitel", textContent: `Bak ${nr}`}), vlak));
     });
   });
   werkBij();
 }
+// ====== PLEK KIEZEN: TIKKEN, OF INGEDRUKT HOUDEN EN SLEPEN MET VERGROOTGLAS ======
+// Kort tikken zet de cirkel meteen. Vinger even stil houden (0,23 s) en slepen: een vergrootglas toont de plek boven je vinger.
+const LOEP = {el: null, in: null, ZOOM: 2.5};
+function loepAan(knipEl) {
+  if (!LOEP.el) {
+    LOEP.in = h("div", {className: "loep-in"});
+    LOEP.el = h("div", {id: "loep", hidden: true}, LOEP.in, h("span", {className: "loep-ring"}));
+    LOEP.el.setAttribute("aria-hidden", "true"); document.body.append(LOEP.el);
+  }
+  const r = knipEl.getBoundingClientRect(), kopie = knipEl.cloneNode(true);
+  kopie.style.cssText += `;width:${r.width}px;height:${r.height}px;max-width:none`;
+  LOEP.in.replaceChildren(kopie); LOEP.in.style.width = r.width + "px"; LOEP.in.style.height = r.height + "px";
+  LOEP.el.hidden = false;
+}
+function loepBij(knipEl, cx, cy) {
+  const r = knipEl.getBoundingClientRect(), x = Math.min(r.width, Math.max(0, cx - r.left)), y = Math.min(r.height, Math.max(0, cy - r.top));
+  const R = LOEP.el.clientWidth / 2, Ro = LOEP.el.offsetWidth / 2, Z = LOEP.ZOOM;
+  LOEP.in.style.transform = `translate(${R - x * Z}px, ${R - y * Z}px) scale(${Z})`;
+  const lx = Math.min(innerWidth - Ro - 8, Math.max(Ro + 8, cx));
+  let ly = cy - Ro - 70;                 // boven de vinger
+  if (ly < Ro + 60) ly = cy + Ro + 70;   // of eronder als er boven geen plek is
+  LOEP.el.style.left = lx - Ro + "px"; LOEP.el.style.top = ly - Ro + "px";
+}
+function koppelPlaatsen(vlak, nr) {
+  const knipEl = () => vlak.firstElementChild, klem = v => Math.min(1, Math.max(0, v));
+  const zet = (cx, cy) => { const r = knipEl().getBoundingClientRect(); keuze = {bak: nr, x: klem((cx - r.left) / r.width), y: klem((cy - r.top) / r.height)}; werkBij(); };
+  let id = null, timer = null, sleept = false, start = null, laatst = null;
+  const stop = () => { clearTimeout(timer); timer = null; if (sleept && LOEP.el) LOEP.el.hidden = true; sleept = false; id = null; };
+  const begin = () => { try { vlak.setPointerCapture(id); } catch (_) {} sleept = true; loepAan(knipEl()); zet(laatst.x, laatst.y); loepBij(knipEl(), laatst.x, laatst.y); };
+  vlak.addEventListener("pointerdown", e => {
+    if (id !== null || (e.pointerType === "mouse" && e.button !== 0)) return;
+    id = e.pointerId; start = laatst = {x: e.clientX, y: e.clientY};
+    if (e.pointerType === "mouse") begin(); else timer = setTimeout(() => { timer = null; begin(); }, 230);
+  });
+  vlak.addEventListener("pointermove", e => {
+    if (e.pointerId !== id) return;
+    laatst = {x: e.clientX, y: e.clientY};
+    if (sleept) { zet(laatst.x, laatst.y); loepBij(knipEl(), laatst.x, laatst.y); }
+    else if (timer && Math.hypot(laatst.x - start.x, laatst.y - start.y) > 10) { clearTimeout(timer); timer = null; id = null; } // je scrolt de pagina
+  });
+  vlak.addEventListener("pointerup", e => {
+    if (e.pointerId !== id) return;
+    if (sleept || timer) zet(e.clientX, e.clientY); // slepen afgelopen, of een korte tik
+    stop();
+  });
+  vlak.addEventListener("pointercancel", e => { if (e.pointerId === id) stop(); });
+  vlak.addEventListener("touchmove", e => { if (sleept) e.preventDefault(); }, {passive: false}); // tijdens slepen scrolt de pagina niet mee
+  vlak.addEventListener("contextmenu", e => e.preventDefault());
+}
 // Zet de rode cirkel op de gekozen plek, zonder alles opnieuw te tekenen.
 function werkBij() {
   document.querySelectorAll(".stip").forEach(e => e.remove());
   document.querySelectorAll(".bak").forEach(e => e.classList.remove("gekozen"));
   if (!keuze) { $("keuze").textContent = "Tik op de plek in de trein waar je zit."; return; }
+  $("deel-melding").hidden = true;
   const bak = $("bak" + keuze.bak); bak.classList.add("gekozen");
   const stip = h("span", {className: "stip"}); stip.style.left = keuze.x * 100 + "%"; stip.style.top = keuze.y * 100 + "%";
   bak.querySelector(".vlak").append(stip);
@@ -939,7 +997,7 @@ function kaartIn() {
 function vernieuwKaart() { if (RIJ.bezig) RIJ.uitgesteld = true; else tekenKaart(); }
 function naarHome() {
   RIJ.uitgesteld = false;
-  $("kaart").hidden = true; $("onder").hidden = false; keuze = null;
+  $("kaart").hidden = true; $("onder").hidden = false; keuze = null; $("deel-melding").hidden = true;
   if (!$("f-station").hidden && $("treinen").children.length) $("treinen").hidden = false;
   if (modus === "auto") { $("f-auto").hidden = false; autoStart(); }
   window.scrollTo({top: 0, behavior: "smooth"});
@@ -948,8 +1006,8 @@ const wegRijden = () => rijAnimatie("rij-uit", 750).then(naarHome);
 $("terug").onclick = naarHome;
 $("deel").onclick = async () => {
   if (RIJ.bezig) return;
-  if (!keuze) return melding("Tik eerst op je plek in de trein.");
-  melding("");
+  if (!keuze) return deelMelding("Tik eerst op je plek in de trein.");
+  deelMelding("");
   const tekst = `${zin()} ${titel()}.`;
   let blob;
   try { const cv = await maakDeelplaatje(); blob = await new Promise((ok, fout) => cv.toBlob(x => x ? ok(x) : fout(new Error("toBlob")), "image/png")); }
@@ -961,7 +1019,7 @@ $("deel").onclick = async () => {
   toonOverlay(URL.createObjectURL(blob), tekst);
 };
 async function deelTekst(tekst) {
-  try { if (navigator.share) { await navigator.share({text: tekst}); wegRijden(); } else { await navigator.clipboard.writeText(tekst); melding("Tekst gekopieerd."); } } catch (_) {}
+  try { if (navigator.share) { await navigator.share({text: tekst}); wegRijden(); } else { await navigator.clipboard.writeText(tekst); deelMelding("Tekst gekopieerd.", true); } } catch (_) {}
 }
 function toonOverlay(url, tekst) {
   const o = h("div", {id: "overlay"},

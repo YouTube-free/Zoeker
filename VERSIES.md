@@ -11,6 +11,7 @@
 `index.html` (de app) · `sw.js` (offline) · `manifest.webmanifest` · `icon-*.png` · `plaatjes/` · `worker.js` (Cloudflare, niet op GitHub)
 
 ## Log (nieuwste bovenaan)
+- **v9** · 10 okt 2026 · Claude A (gebaseerd op v8 van Claude B): vergrootglas bij het kiezen van je plek (kort tikken zet de cirkel meteen; vinger 0,23 s stilhouden en slepen toont een vergrootglas boven je vinger en de pagina scrolt dan niet mee); de melding "Tik eerst op je plek in de trein" staat nu in een rood vlak vlak boven de Deel-knop (schudt even, verdwijnt zodra je een plek kiest).
 - **v8** · 10 okt 2026 · Claude B: in het deelplaatje is elk treindeel een eigen trein: de eerste bak van elk deel heeft een afgeronde linkerbovenhoek en de laatste bak een afgeronde rechterbovenhoek (bij 6 bakken in 2 delen dus ronding bij 1, 3, 4 en 6). Het kopje "Voorkant ... Achterkant" bovenin is gewoon zoals het was.
 - **v7** · 10 okt 2026 · Claude B: tandwiel rechtsboven opent **Instellingen** (Animatie aan/uit + Zelf trein samenstellen verhuisd van het beginscherm); verversknop staat rechts als echte knop met tekst "Ververs" (hij zag er kapot uit door mijn eigen v6-stijl, die is weg); het grijze treinlogo staat er alleen nog als er niets anders op het scherm staat (puur CSS met `:has()`).
 - **v6** · 10 okt 2026 · Claude B: animatie volgt niet meer de iPhone-instelling "Beperk beweging" (daardoor was hij onzichtbaar); knop "Animatie: aan/uit" onderaan de startpagina. Let op: Claude B = de Claude die dit log voor het eerst ziet; de eerdere regels (v2 t/m v5) zijn van de andere Claude, die als "Claude A" tekende. Het eerdere werk van Claude B (Kopieer-knop, testplek, ICE-stel 8001-8090) zit niet in deze versie.
@@ -22,6 +23,7 @@
 
 ## Open / niet getest
 - `worker.js` en de NS-veldnamen zijn niet met een echte NS-sleutel getest.
+- Vergrootglas alleen getest met nagebootste aanraking in Chromium, niet op een echte iPhone (houd-en-sleep, scrollen en het vergrootglas boven de vinger).
 - Animaties alleen getest in een gewone browser (ook met "beperk beweging" aan), niet op een echte iPhone.
 - Vragen: welke VIRM-nummers zijn oud/flow? ICNG-D (3351-3362) ook flow? R-net 2010-2015 = 3 bakken? SNG-4 boven 2750 (tot 2788)?
 - Nog geen plaatje: WINK, Arriva-FLIRT, Valleilijn, TGV.
