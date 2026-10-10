@@ -108,7 +108,7 @@ html.rijdt,html.rijdt body{overflow-x:hidden}
 .rij-uit{animation:rijUit .75s cubic-bezier(.55,0,.9,.45) both}
 @keyframes rijIn{from{transform:translateX(115vw)}to{transform:none}}
 @keyframes rijUit{from{transform:none}to{transform:translateX(-125vw)}}
-@media (prefers-reduced-motion:reduce){.rij-in,.rij-uit{animation:none}}
+.klein{display:block;margin:14px auto 0;padding:8px 12px;background:none;border:0;color:var(--muted);font-size:14px;text-decoration:underline}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -199,6 +199,7 @@ html.rijdt,html.rijdt body{overflow-x:hidden}
   <rect class="u" x="87" y="92" width="26" height="14" rx="3"/>
   <path d="M58 124l-9 22M142 124l9 22M28 146H172" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none"/>
 </svg>
+<button type="button" id="beweging" class="klein"></button>
 </div>
 
 <section id="kaart" hidden aria-live="polite">
@@ -880,7 +881,13 @@ $("f-station").onsubmit = async e => {
 $("draai").onclick = () => { omgekeerd = !omgekeerd; keuze = null; tekenKaart(); };
 // ====== TREIN RIJDT BINNEN EN WEG ======
 const RIJ = {bezig: false, uitgesteld: false}, STAP = 85; // STAP = ms tussen twee bakken
-const minderBeweging = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+// De animatie volgt bewust NIET de iPhone-instelling "Beperk beweging" (die zette hem uit). Aan/uit-knop onderaan de startpagina.
+const BEW = "treinplek-beweging";
+const bewLees = () => { try { return localStorage.getItem(BEW) || "aan"; } catch (_) { return "aan"; } };
+const minderBeweging = () => bewLees() === "uit";
+const bewTekst = () => { $("beweging").textContent = "Animatie: " + bewLees(); };
+$("beweging").onclick = () => { try { localStorage.setItem(BEW, bewLees() === "aan" ? "uit" : "aan"); } catch (_) {} bewTekst(); };
+bewTekst();
 function rijAnimatie(klasse, duur) {
   const baks = [...document.querySelectorAll("#bakken .bak")];
   if (!baks.length || minderBeweging()) return Promise.resolve();

@@ -11,6 +11,7 @@
 `index.html` (de app) · `sw.js` (offline) · `manifest.webmanifest` · `icon-*.png` · `plaatjes/` · `worker.js` (Cloudflare, niet op GitHub)
 
 ## Log (nieuwste bovenaan)
+- **v6** · 10 okt 2026 · Claude B: animatie volgt niet meer de iPhone-instelling "Beperk beweging" (daardoor was hij onzichtbaar); knop "Animatie: aan/uit" onderaan de startpagina. Let op: Claude B = de Claude die dit log voor het eerst ziet; de eerdere regels (v2 t/m v5) zijn van de andere Claude, die als "Claude A" tekende. Het eerdere werk van Claude B (Kopieer-knop, testplek, ICE-stel 8001-8090) zit niet in deze versie.
 - **v5** · 10 okt 2026 · Claude A: bakken rijden binnen zodra je een trein kiest; na delen rijden ze weg en ben je thuis (Andere trein is meteen, "beweging verminderen" slaat het over).
 - **v4** · 10 okt 2026 · Claude A: nieuwe startindeling voor telefoon (Automatisch + Treinnummer/Station/Treinstel, grotere knoppen, grijs treinlogo); Automatisch = treinen bij jou via live locatie met filter IC/SPR/ICE, ruimer zoeken en "waarschijnlijk jouw trein"; `worker.js` toegevoegd (routes /nabij en /rit); ICE 3neo = 8001-8090.
 - **v3** · Claude A: plaatjes erbij (SNG, SLT, ICM, ICE, GTW, LINT, FLIRT R-net, VIRM oud/flow, ICNG-B flow); kleuring kiezen bij VIRM en ICNG; stelnummers uit `Treinstelnummers_Nederland.xlsx`.
@@ -19,6 +20,6 @@
 
 ## Open / niet getest
 - `worker.js` en de NS-veldnamen zijn niet met een echte NS-sleutel getest.
-- Animaties alleen getest in een gewone browser, niet op een echte iPhone.
+- Animaties alleen getest in een gewone browser (ook met "beperk beweging" aan), niet op een echte iPhone.
 - Vragen: welke VIRM-nummers zijn oud/flow? ICNG-D (3351-3362) ook flow? R-net 2010-2015 = 3 bakken? SNG-4 boven 2750 (tot 2788)?
 - Nog geen plaatje: WINK, Arriva-FLIRT, Valleilijn, TGV.
