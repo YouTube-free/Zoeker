@@ -103,6 +103,12 @@ select{width:100%;font:inherit;font-size:17px;min-height:52px;padding:11px 8px;b
 .s-spr{background:#fff;border:2px solid var(--blauw);color:var(--blauw)}
 .s-ice{background:#fff;border:2px solid #e4002b;color:#e4002b}
 .s-icd{background:var(--blauw);color:#fff}
+html.rijdt,html.rijdt body{overflow-x:hidden}
+.rij-in{animation:rijIn .8s cubic-bezier(.15,.85,.25,1) both}
+.rij-uit{animation:rijUit .75s cubic-bezier(.55,0,.9,.45) both}
+@keyframes rijIn{from{transform:translateX(115vw)}to{transform:none}}
+@keyframes rijUit{from{transform:none}to{transform:translateX(-125vw)}}
+@media (prefers-reduced-motion:reduce){.rij-in,.rij-uit{animation:none}}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -304,7 +310,7 @@ async function toonTrein(nr, meta = {}) {
     if (!t.delen.length) { console.log("Geen bakken gevonden"); throw new Error("Geen samenstelling gevonden voor dit treinnummer. Het antwoord van NS heeft mogelijk een ander formaat."); }
     trein = t; omgekeerd = false; keuze = null;
     $("treinen").hidden = true; $("onder").hidden = true; $("kaart").hidden = false;
-    tekenKaart();
+    tekenKaart(); kaartIn();
     $("kaart").scrollIntoView({behavior: "smooth"});
   } catch (e) { melding(e.message); }
 }
@@ -514,7 +520,7 @@ async function laadPlaatje(url) {
     const r = await fetch(`${WORKER_URL}/plaatje?url=${encodeURIComponent(url)}`);
     if (!r.ok) throw new Error(r.status);
     bronCache.set(url, URL.createObjectURL(await r.blob()));
-    tekenKaart();
+    vernieuwKaart();
   } catch (e) { console.log("Plaatje niet geladen", e); }
 }
 // Getekende zijaanzichten (demo en reserve), geen foto's.
@@ -586,7 +592,7 @@ $("f-zelf").onsubmit = e => {
   info = {nr, soort: nr ? "Trein" : "Eigen trein"};
   omgekeerd = false; keuze = null;
   $("treinen").hidden = true; $("onder").hidden = true; $("kaart").hidden = false;
-  tekenKaart(); $("kaart").scrollIntoView({behavior: "smooth"});
+  tekenKaart(); kaartIn(); $("kaart").scrollIntoView({behavior: "smooth"});
 };
 
 // ====== TREINSTELNUMMERS ======
@@ -660,7 +666,7 @@ function toonStellen(w, meta) {
   info = meta || {nr: w.join(" + "), soort: w.length > 1 ? "Treinstellen" : "Treinstel"};
   omgekeerd = false; keuze = null;
   $("treinen").hidden = true; $("onder").hidden = true; $("kaart").hidden = false;
-  tekenKaart(); $("kaart").scrollIntoView({behavior: "smooth"});
+  tekenKaart(); kaartIn(); $("kaart").scrollIntoView({behavior: "smooth"});
 }
 $("f-stel").onsubmit = e => {
   e.preventDefault(); melding("");
@@ -872,8 +878,35 @@ $("f-station").onsubmit = async e => {
 };
 
 $("draai").onclick = () => { omgekeerd = !omgekeerd; keuze = null; tekenKaart(); };
-$("terug").onclick = () => { $("kaart").hidden = true; $("onder").hidden = false; keuze = null; if (!$("f-station").hidden && $("treinen").children.length) $("treinen").hidden = false; if (modus === "auto") { $("f-auto").hidden = false; autoStart(); } window.scrollTo({top: 0, behavior: "smooth"}); };
+// ====== TREIN RIJDT BINNEN EN WEG ======
+const RIJ = {bezig: false, uitgesteld: false}, STAP = 85; // STAP = ms tussen twee bakken
+const minderBeweging = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+function rijAnimatie(klasse, duur) {
+  const baks = [...document.querySelectorAll("#bakken .bak")];
+  if (!baks.length || minderBeweging()) return Promise.resolve();
+  RIJ.bezig = true; document.documentElement.classList.add("rijdt");
+  baks.forEach((b, i) => { b.style.animationDelay = i * STAP + "ms"; b.classList.add(klasse); });
+  return new Promise(klaar => setTimeout(() => { document.documentElement.classList.remove("rijdt"); RIJ.bezig = false; klaar(); }, (baks.length - 1) * STAP + duur + 60));
+}
+// Voorkant eerst: de trein rijdt van rechts naar links het scherm op.
+function kaartIn() {
+  rijAnimatie("rij-in", 800).then(() => {
+    document.querySelectorAll("#bakken .bak").forEach(b => { b.classList.remove("rij-in"); b.style.animationDelay = ""; });
+    if (RIJ.uitgesteld) { RIJ.uitgesteld = false; tekenKaart(); }
+  });
+}
+function vernieuwKaart() { if (RIJ.bezig) RIJ.uitgesteld = true; else tekenKaart(); }
+function naarHome() {
+  RIJ.uitgesteld = false;
+  $("kaart").hidden = true; $("onder").hidden = false; keuze = null;
+  if (!$("f-station").hidden && $("treinen").children.length) $("treinen").hidden = false;
+  if (modus === "auto") { $("f-auto").hidden = false; autoStart(); }
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+const wegRijden = () => rijAnimatie("rij-uit", 750).then(naarHome);
+$("terug").onclick = naarHome;
 $("deel").onclick = async () => {
+  if (RIJ.bezig) return;
   if (!keuze) return melding("Tik eerst op je plek in de trein.");
   melding("");
   const tekst = `${zin()} ${titel()}.`;
@@ -882,18 +915,18 @@ $("deel").onclick = async () => {
   catch (e) { console.warn(e); return deelTekst(tekst); }
   const file = new File([blob], `treinplek-bak-${keuze.bak}.png`, {type: "image/png"});
   try {
-    if (navigator.canShare && navigator.canShare({files: [file]})) { await navigator.share({files: [file], text: tekst}); return; }
+    if (navigator.canShare && navigator.canShare({files: [file]})) { await navigator.share({files: [file], text: tekst}); return wegRijden(); }
   } catch (e) { if (e.name === "AbortError") return; console.warn(e); }
   toonOverlay(URL.createObjectURL(blob), tekst);
 };
 async function deelTekst(tekst) {
-  try { if (navigator.share) await navigator.share({text: tekst}); else { await navigator.clipboard.writeText(tekst); melding("Tekst gekopieerd."); } } catch (_) {}
+  try { if (navigator.share) { await navigator.share({text: tekst}); wegRijden(); } else { await navigator.clipboard.writeText(tekst); melding("Tekst gekopieerd."); } } catch (_) {}
 }
 function toonOverlay(url, tekst) {
   const o = h("div", {id: "overlay"},
     h("p", {textContent: "Houd je vinger op het plaatje en kies Bewaar of Deel."}),
     h("img", {src: url, alt: tekst}),
-    h("button", {className: "knop", type: "button", textContent: "Sluiten", style: "max-width:300px", onclick: () => o.remove()}));
+    h("button", {className: "knop", type: "button", textContent: "Sluiten", style: "max-width:300px", onclick: () => { o.remove(); wegRijden(); }}));
   document.body.append(o);
 }
 
