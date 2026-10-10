@@ -20,15 +20,12 @@
 body{margin:0 auto;max-width:520px;padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(48px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));-webkit-tap-highlight-color:transparent;background:var(--bg);color:var(--ink);font:400 17px/1.4 Barlow,system-ui,sans-serif}
 h1{font:700 34px/1.05 'Barlow Condensed',system-ui,sans-serif;margin:8px 0 12px}
 .demo{background:var(--accent);padding:8px 12px;border-radius:10px;font-size:15px;margin-bottom:14px}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 button{font:inherit;cursor:pointer}
-.tab{min-height:48px;padding:10px 4px;font-size:16px;border:2px solid var(--blauw);background:transparent;color:var(--blauw);border-radius:12px;font-weight:600}
-.tab[aria-selected=true]{background:var(--blauw);color:#fff}
 label{display:block;font-weight:600;margin:10px 0 4px}
-input{width:100%;font:inherit;padding:12px;border:2px solid var(--lijn);border-radius:12px;background:#fff;color:var(--ink)}
+input{width:100%;font:inherit;font-size:17px;min-height:52px;padding:12px;border:2px solid var(--lijn);border-radius:14px;background:#fff;color:var(--ink)}
 .rij{display:grid;grid-template-columns:2fr 1fr;gap:8px}
-.knop{width:100%;margin-top:14px;padding:13px;border:0;border-radius:12px;background:var(--blauw);color:#fff;font-weight:600}
-.tekst{padding:11px;border:2px solid var(--blauw);border-radius:12px;background:transparent;color:var(--blauw);font-weight:600}
+.knop{width:100%;margin-top:14px;min-height:54px;padding:13px;border:0;border-radius:14px;background:var(--blauw);color:#fff;font-weight:700;font-size:17px}
+.tekst{min-height:50px;padding:11px;border:2px solid var(--blauw);border-radius:14px;font-size:16px;background:transparent;color:var(--blauw);font-weight:600}
 :focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 .melding{margin-top:12px;color:#9b1c1c;font-weight:600}
 .lijst{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:6px}
@@ -54,10 +51,7 @@ input{width:100%;font:inherit;padding:12px;border:2px solid var(--lijn);border-r
 #overlay{position:fixed;inset:0;z-index:10;background:rgba(16,33,58,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;overflow:auto}
 #overlay img{max-width:100%;max-height:70vh;border-radius:12px;background:#fff}
 #overlay p{color:#fff;margin:0;text-align:center}
-.zelf{margin-top:30px;font-size:13px;color:var(--muted);text-align:center}
-.zelf summary{cursor:pointer;display:inline-block;padding:6px 10px;border-radius:8px;opacity:.75}
-.zelf form{text-align:left;margin-top:8px;background:#fff;border-radius:14px;padding:12px}
-select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);border-radius:12px;background:#fff;color:var(--ink)}
+select{width:100%;font:inherit;font-size:17px;min-height:52px;padding:11px 8px;border:2px solid var(--lijn);border-radius:14px;background:#fff;color:var(--ink)}
 .zdeel{margin-top:10px}
 .rij3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .stelhulp{margin:12px 0 0;font-size:14px;color:var(--muted);line-height:1.5}
@@ -73,48 +67,76 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
 #keuze{margin:14px 0 0;font:700 26px/1.1 'Barlow Condensed',sans-serif}
 .acties{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
 .acties .knop{margin:0}
+.modi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.modus{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:98px;padding:10px 4px;border:2px solid var(--blauw);border-radius:18px;background:#fff;color:var(--blauw);font-weight:700;font-size:15px;line-height:1.1;text-align:center}
+.modus svg{width:32px;height:32px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.modus[aria-selected=true]{background:var(--blauw);color:#fff}
+.modus.hoofd{grid-column:1/-1;flex-direction:row;justify-content:flex-start;gap:14px;min-height:80px;padding:10px 18px;font-size:20px;text-align:left}
+.modus.hoofd small{display:block;margin-top:2px;font-weight:400;font-size:14px;opacity:.9}
+.zelf{margin-top:18px}
+.zelf summary{list-style:none;display:flex;align-items:center;justify-content:center;gap:8px;min-height:60px;padding:10px 16px;border:2px solid var(--lijn);border-radius:18px;background:#fff;color:var(--blauw);font-weight:700;font-size:17px;cursor:pointer}
+.zelf summary::-webkit-details-marker{display:none}
+.zelf summary::after{content:"›";font-size:26px;line-height:1;transform:rotate(90deg);transition:transform .15s}
+.zelf[open] summary::after{transform:rotate(-90deg)}
+.zelf form{text-align:left;margin-top:10px;background:#fff;border-radius:18px;padding:14px}
+#treinlogo{display:block;margin:28px auto 4px;width:190px;max-width:60%;color:#cbd3df}
+#treinlogo .u{fill:var(--bg)}
+.autokaart{background:#fff;border-radius:18px;padding:18px;text-align:center}
+.autokaart p{margin:0 0 6px}
+.autokaart small{display:block;margin-top:10px;color:var(--muted);font-size:13px}
+.auto-kop{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--muted);font-size:14px;margin:2px 2px 6px}
+.klein{min-width:48px;min-height:44px;border:2px solid var(--blauw);border-radius:14px;background:#fff;color:var(--blauw);font-size:20px;font-weight:700}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;margin:0 -2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;min-height:46px;padding:0 18px;border:2px solid var(--blauw);border-radius:23px;background:#fff;color:var(--blauw);font-weight:700;font-size:16px}
+.chip[aria-pressed=true]{background:var(--blauw);color:#fff}
+.chip small{font-weight:400;opacity:.8;margin-left:4px}
+.ritten{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.rit{width:100%;display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center;text-align:left;padding:12px;border:2px solid var(--lijn);border-radius:16px;background:#fff;color:var(--ink);min-height:84px}
+.rit.jouw{border-color:var(--blauw);box-shadow:0 0 0 3px rgba(11,59,140,.18)}
+.rit strong{display:block;font:700 22px/1.1 'Barlow Condensed',sans-serif}
+.rit small{display:block;color:var(--muted);font-size:14px;line-height:1.35;margin-top:2px}
+.rit .afst{font-weight:700;color:var(--blauw);white-space:nowrap;align-self:start}
+.jouwtag{display:inline-block;margin-bottom:4px;padding:2px 8px;border-radius:8px;background:var(--blauw);color:#fff;font-size:12px;font-weight:700}
+.soort{padding:10px 4px;border-radius:12px;text-align:center;font:700 21px/1 'Barlow Condensed',sans-serif;background:#dbe3ee;color:var(--ink)}
+.s-ic{background:var(--accent);color:var(--ink)}
+.s-spr{background:#fff;border:2px solid var(--blauw);color:var(--blauw)}
+.s-ice{background:#fff;border:2px solid #e4002b;color:#e4002b}
+.s-icd{background:var(--blauw);color:#fff}
 [hidden]{display:none!important}
-.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
-.chip{min-height:48px;padding:10px 6px;border:2px solid var(--blauw);border-radius:12px;background:#fff;color:var(--blauw);font-weight:600}
-.chip[aria-pressed=true]{background:var(--accent);border-color:var(--ink);color:var(--ink)}
-.lijst .sectie{margin-top:12px}
-.lijst .sectie b{display:block;font:700 22px/1.1 'Barlow Condensed',sans-serif}
-.lijst .sectie span{font-size:13px;color:var(--muted)}
-.lijst .leeg{color:var(--muted);padding:8px 2px}
-.lijst .tag{font:700 15px/1 'Barlow Condensed',sans-serif;padding:6px 8px;border-radius:8px;background:var(--blauw);color:#fff}
-.lijst .tag.SPR{background:#fff;color:var(--blauw);border:2px solid var(--blauw)}
-.lijst .laat{color:#9b1c1c;font-weight:600}
 </style>
 </head>
 <body>
 <h1>Waar zit ik in de trein?</h1>
-<div id="demo" class="demo" hidden><b>Testversie.</b> Treinen, stations en locatie zijn nagebootst. Er is nog geen verbinding met NS. Treinnummer 0 t/m 9 aan het eind van het nummer geeft elk een ander type trein.</div>
+<div id="demo" class="demo" hidden>Demo met nepdata. Vul bovenin het script je Worker-URL in voor echte treinen.</div>
 
-<div class="tabs" role="tablist">
-  <button class="tab" role="tab" id="tab-auto" aria-selected="true">Automatisch</button>
-  <button class="tab" role="tab" id="tab-nummer" aria-selected="false">Treinnummer</button>
-  <button class="tab" role="tab" id="tab-station" aria-selected="false">Station</button>
-  <button class="tab" role="tab" id="tab-stel" aria-selected="false">Treinstel</button>
+<div class="modi" role="tablist" aria-label="Zo vind je je trein">
+  <button class="modus hoofd" role="tab" id="tab-auto" aria-selected="true">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+    <span>Automatisch<small>Treinen bij jou in de buurt</small></span>
+  </button>
+  <button class="modus" role="tab" id="tab-nummer" aria-selected="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 3L7.5 21M16.5 3l-2 18M4 9h17M3 15h17"/></svg>Treinnummer</button>
+  <button class="modus" role="tab" id="tab-station" aria-selected="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V10l7-5 7 5v11M9.5 21v-6h5v6"/></svg>Station</button>
+  <button class="modus" role="tab" id="tab-stel" aria-selected="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10a3 3 0 013 3v9a3 3 0 01-3 3H7a3 3 0 01-3-3V6a3 3 0 013-3zM4 11h16M8 21l2-3M16 21l-2-3"/><circle cx="8" cy="14.5" r=".6"/><circle cx="16" cy="14.5" r=".6"/></svg>Treinstel</button>
 </div>
 
-<div id="f-auto">
-  <p id="auto-status" class="stelhulp">Je locatie opzoeken…</p>
-  <p id="auto-hint" class="stelhulp" hidden>Je lijkt onderweg te zijn. Daarom zoeken we ook de dichtstbijzijnde IC-stop.</p>
-  <div class="chips" role="group" aria-label="Soort trein">
-    <button type="button" class="chip" data-f="alles" aria-pressed="true">Alles</button>
-    <button type="button" class="chip" data-f="IC" aria-pressed="false">IC</button>
-    <button type="button" class="chip" data-f="SPR" aria-pressed="false">SPR</button>
+<section id="f-auto">
+  <div id="auto-start" class="autokaart">
+    <p><b>Zoek je trein automatisch</b></p>
+    <p id="auto-tekst">Ik gebruik je locatie om te laten zien welke treinen nu bij jou in de buurt rijden. Jij tikt op de jouwe.</p>
+    <button class="knop" id="auto-knop" type="button">Gebruik mijn locatie</button>
+    <small>Je locatie wordt alleen gebruikt om treinen in de buurt te zoeken en wordt niet bewaard.</small>
   </div>
-  <div id="testplek-w" hidden>
-    <label for="testplek">Testplek (alleen in de testversie)</label>
-    <select id="testplek"></select>
+  <div id="auto-lijst" hidden>
+    <div class="auto-kop"><span id="auto-status"></span><button class="klein" id="auto-vernieuw" type="button" aria-label="Vernieuwen">&#8635;</button></div>
+    <div class="chips" id="auto-chips" role="group" aria-label="Filter op soort trein"></div>
+    <p class="stelhulp" id="auto-info" hidden></p>
+    <ul class="ritten" id="auto-ritten"></ul>
   </div>
-  <ul id="auto-lijst" class="lijst"></ul>
-  <div class="acties">
-    <button class="tekst" id="auto-nieuw" type="button">Opnieuw zoeken</button>
-    <button class="tekst" id="auto-station" type="button">Station kiezen</button>
-  </div>
-</div>
+</section>
 
 <form id="f-nummer" hidden>
   <label for="nummer">Treinnummer (staat in de NS-app)</label>
@@ -146,6 +168,7 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
 <div id="melding" class="melding" role="alert" hidden></div>
 <ul id="treinen" class="lijst" hidden></ul>
 
+<div id="onder">
 <details id="zelf" class="zelf">
   <summary>Zelf trein samenstellen</summary>
   <form id="f-zelf">
@@ -161,6 +184,16 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
     <small id="z-uitleg"></small>
   </form>
 </details>
+<svg id="treinlogo" viewBox="0 0 200 150" aria-hidden="true">
+  <rect x="82" y="2" width="36" height="9" rx="4.5" fill="currentColor"/>
+  <path d="M40 24Q40 11 56 11H144Q160 11 160 24V112Q160 124 148 124H52Q40 124 40 112Z" fill="currentColor"/>
+  <rect class="u" x="54" y="26" width="92" height="48" rx="13"/>
+  <rect x="98" y="26" width="4" height="48" fill="currentColor"/>
+  <circle class="u" cx="63" cy="98" r="8"/><circle class="u" cx="137" cy="98" r="8"/>
+  <rect class="u" x="87" y="92" width="26" height="14" rx="3"/>
+  <path d="M58 124l-9 22M142 124l9 22M28 146H172" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none"/>
+</svg>
+</div>
 
 <section id="kaart" hidden aria-live="polite">
   <h2 id="k-titel"></h2>
@@ -169,11 +202,11 @@ select{width:100%;font:inherit;padding:11px 8px;border:2px solid var(--lijn);bor
   <div id="bakken"></div>
   <div id="keuze"></div>
   <div class="acties">
-    <button class="knop" id="kopieer">Kopieer foto en tekst</button>
+    <button class="knop" id="deel">Deel mijn plek</button>
     <button class="tekst" id="draai">Draai trein om</button>
   </div>
   <button class="tekst" id="terug" style="width:100%;margin-top:8px">Andere trein</button>
-  <p style="margin-top:12px;font-size:14px">Tik op Kopieer, open daarna Snapchat (of een andere app) en plak het in je chat.</p>
+  <p style="margin-top:12px;font-size:14px">Tik op Deel mijn plek om een overzichtelijk plaatje met je plek naar je vrienden te sturen.</p>
 </section>
 
 <script>
@@ -227,9 +260,7 @@ function zoekPlaatje(type, n) { return PLAATJES.find(x => x.n === n && x.type.te
 function zoekPlaatjeGroep(groep, variant, n) { return PLAATJES.find(x => x.groep === groep && x.variant === variant && x.n === n) || null; }
 
 // ====== DEMODATA (nep) ======
-// Testtreinen: het treinnummer bepaalt het type (nummer modulo 10), zo zie je alle plaatjes terug.
-const DEMO_TYPES = [{type:"ICNG", delen:[8]}, {type:"SNG", delen:[4,3]}, {type:"DDZ", delen:[6,4]}, {type:"VIRM", delen:[6]}, {type:"SLT", delen:[6,4]},
-  {type:"ICM", delen:[3,4]}, {type:"ICE", delen:[8]}, {type:"GTW", delen:[2,3]}, {type:"LINT", delen:[2]}, {type:"FLIRT", delen:[4,3]}];
+const DEMO_TYPES = [{type:"ICNG", delen:[8]}, {type:"SNG", delen:[4,3]}, {type:"DDZ", delen:[6,4]}, {type:"VIRM", delen:[6]}];
 const DEMO_NAAR = ["Zwolle","Eindhoven Centraal","Amsterdam Centraal","Arnhem Centraal","Rotterdam Centraal"];
 function demoVertrek(tijd) {
   const [u, m] = tijd.split(":").map(Number);
@@ -272,7 +303,7 @@ async function toonTrein(nr, meta = {}) {
     const t = DEMO ? demoTrein(Number(nr)) : leesTrein(await api(`/trein?nummer=${encodeURIComponent(nr)}`));
     if (!t.delen.length) { console.log("Geen bakken gevonden"); throw new Error("Geen samenstelling gevonden voor dit treinnummer. Het antwoord van NS heeft mogelijk een ander formaat."); }
     trein = t; omgekeerd = false; keuze = null;
-    $("treinen").hidden = true; $("zelf").hidden = true; $("kaart").hidden = false;
+    $("treinen").hidden = true; $("onder").hidden = true; $("kaart").hidden = false;
     tekenKaart();
     $("kaart").scrollIntoView({behavior: "smooth"});
   } catch (e) { melding(e.message); }
@@ -332,7 +363,6 @@ function tekenKaart() {
 }
 // Zet de rode cirkel op de gekozen plek, zonder alles opnieuw te tekenen.
 function werkBij() {
-  bereidFotoVoor();
   document.querySelectorAll(".stip").forEach(e => e.remove());
   document.querySelectorAll(".bak").forEach(e => e.classList.remove("gekozen"));
   if (!keuze) { $("keuze").textContent = "Tik op de plek in de trein waar je zit."; return; }
@@ -384,13 +414,11 @@ async function maakDeelplaatje() {
   const sx0 = P + (IW - stripB) / 2, sx1 = sx0 + stripB;
   const sub = [titel(), info.tijd ? `${fmt(info.tijd)}${info.spoor ? ", spoor " + info.spoor : ""}` : ""].filter(Boolean);
   const H = 60 + 98 + 60 + sub.length * 44 + 28 + 36 + 16 + (meer ? 52 : 0) + BLH + 60 + bh + 24 + 14 + 40 + 36 + 26 + 56;
-  const H2 = Math.max(H, 1920), off = Math.round((H2 - H) / 2); // staand schermformaat (9:16)
-  const cv = document.createElement("canvas"); cv.width = W; cv.height = H2;
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
   const c = cv.getContext("2d");
-  const g = c.createLinearGradient(0, 0, 0, H2); g.addColorStop(0, "#0d44a0"); g.addColorStop(1, "#08296a");
-  c.fillStyle = g; c.fillRect(0, 0, W, H2);
+  const g = c.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#0d44a0"); g.addColorStop(1, "#08296a");
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
   c.fillStyle = GEEL; c.fillRect(0, 0, W, 14);
-  c.translate(0, off);
   c.textBaseline = "top"; c.textAlign = "left";
   let y = 60;
   c.fillStyle = "#fff"; c.font = `700 92px ${kop}`; c.fillText(`Ik zit in bak ${keuze.bak}`, P, y); y += 98;
@@ -516,7 +544,8 @@ const ZELF = {
   SLT:   {naam: "SLT (Sprinter)",            maten: [4, 6], maxDelen: 3},
   DDZ:   {naam: "DDZ (Dubbeldekker)",        maten: [4, 6], maxDelen: 2},
   VIRM:  {naam: "VIRM (Intercity)",          maten: [4, 6], maxDelen: 3},
-  ICM:   {naam: "ICM Koploper (Intercity)",  maten: [3, 4], maxDelen: 3}
+  ICM:   {naam: "ICM Koploper (Intercity)",  maten: [3, 4], maxDelen: 3},
+  ICE:   {naam: "ICE 3neo",                  maten: [8],    maxDelen: 2}
 };
 const ZELF_SLEUTEL = "treinplek-zelf";
 function zelfOpslaan(x) { try { localStorage.setItem(ZELF_SLEUTEL, JSON.stringify(x)); } catch (_) {} }
@@ -556,7 +585,7 @@ $("f-zelf").onsubmit = e => {
   trein = {delen: delen.map(n => ({type, n, img: null, breedtes: Array(n).fill(1)}))};
   info = {nr, soort: nr ? "Trein" : "Eigen trein"};
   omgekeerd = false; keuze = null;
-  $("treinen").hidden = true; $("zelf").hidden = true; $("kaart").hidden = false;
+  $("treinen").hidden = true; $("onder").hidden = true; $("kaart").hidden = false;
   tekenKaart(); $("kaart").scrollIntoView({behavior: "smooth"});
 };
 
@@ -574,7 +603,8 @@ const STELLEN = [
   [228, 251, "GTW", 2, "GTW 2/6 (Arriva)"], [301, 351, "GTW", 3, "GTW 2/8 (Arriva)"],
   [450, 485, null, 3, "FLIRT (Arriva Limburg)"], [550, 585, null, 4, "FLIRT (Arriva Drielandentrein)"],
   [7301, 7315, null, 3, "FLIRT/Protos (Valleilijn)"], [6301, 6315, "LINT", 2, "LINT 41 (Blauwnet)"],
-  [4331, 4332, null, 10, "TGV (Eurostar)"], [4300, 4300, null, 10, "TGV (Eurostar)"], [4651, 4654, null, 8, "ICE 3M (uit dienst)"], [8001, 8090, "ICE", 8, "ICE 3neo"]
+  [4331, 4332, null, 10, "TGV (Eurostar)"], [4300, 4300, null, 10, "TGV (Eurostar)"],
+  [8001, 8090, "ICE", 8, "ICE 3neo"], [4651, 4654, null, 8, "ICE 3M (uit dienst)"]
 ];
 function zoekStel(nr) {
   const n = Number(nr), r = STELLEN.find(x => n >= x[0] && n <= x[1]);
@@ -612,162 +642,210 @@ function stelHulp() {
   }));
 }
 ["s1", "s2", "s3"].forEach(id => $(id).addEventListener("input", stelHulp));
+// Bouwt de treindelen uit een lijst treinstelnummers. Gooit een Error met een leesbare melding als iets niet kan.
+function stellenNaarDelen(w) {
+  const delen = [];
+  for (const x of w) {
+    const st = stelGeldig(x) && zoekStel(x);
+    if (!st) throw new Error(`Het nummer ${x} ken ik niet. Gebruik het nummer van het hele treinstel (3 of 4 cijfers), bijvoorbeeld 7632.`);
+    if (!st.groep) throw new Error(`${x} is een ${st.naam} (${st.n} bakken), maar van dit type heb ik nog geen plaatje.`);
+    const v = stelVariant(st);
+    delen.push({type: st.groep, groep: st.groep, variant: v, naam: st.naam + (VARIANT_KORT[v] ? ` (${VARIANT_KORT[v]})` : ""), nummer: st.nummer, n: st.n, img: null, breedtes: Array(st.n).fill(1)});
+  }
+  return delen;
+}
+function toonStellen(w, meta) {
+  const delen = stellenNaarDelen(w);
+  trein = {delen};
+  info = meta || {nr: w.join(" + "), soort: w.length > 1 ? "Treinstellen" : "Treinstel"};
+  omgekeerd = false; keuze = null;
+  $("treinen").hidden = true; $("onder").hidden = true; $("kaart").hidden = false;
+  tekenKaart(); $("kaart").scrollIntoView({behavior: "smooth"});
+}
 $("f-stel").onsubmit = e => {
   e.preventDefault(); melding("");
   const w = stelWaarden();
   if (!w.length) return melding("Vul het nummer van het treinstel in.");
-  const delen = [];
-  for (const x of w) {
-    const st = stelGeldig(x) && zoekStel(x);
-    if (!st) return melding(`Het nummer ${x} ken ik niet. Gebruik het nummer van het hele treinstel (3 of 4 cijfers), bijvoorbeeld 7632.`);
-    if (!st.groep) return melding(`${x} is een ${st.naam} (${st.n} bakken), maar van dit type heb ik nog geen plaatje.`);
-    const v = stelVariant(st);
-    delen.push({type: st.groep, groep: st.groep, variant: v, naam: st.naam + (VARIANT_KORT[v] ? ` (${VARIANT_KORT[v]})` : ""), nummer: st.nummer, n: st.n, img: null, breedtes: Array(st.n).fill(1)});
-  }
-  trein = {delen};
-  info = {nr: w.join(" + "), soort: w.length > 1 ? "Treinstellen" : "Treinstel"};
-  omgekeerd = false; keuze = null;
-  $("treinen").hidden = true; $("zelf").hidden = true; $("kaart").hidden = false;
-  tekenKaart(); $("kaart").scrollIntoView({behavior: "smooth"});
+  try { toonStellen(w); } catch (err) { melding(err.message); }
 };
 
-// ====== AUTOMATISCH: TREINEN IN DE BUURT ======
-// [code, naam, breedte, lengte, IC-stop?] Alleen voor de demo. Echte stations komen van NS via de Worker (/stations).
-const DEMO_STATIONS = [["AH","Arnhem Centraal",51.9852,5.8987,1],["AHP","Arnhem Velperpoort",51.9873,5.9202,0],["OBK","Oosterbeek",51.9889,5.8468,0],["VP","Velp",51.9996,5.9742,0],
-  ["WF","Wolfheze",52.0051,5.7916,0],["EDE","Ede-Wageningen",52.0429,5.6652,1],["DR","Dieren",52.0502,6.1054,0],["ZP","Zutphen",52.1385,6.2002,1],
-  ["UT","Utrecht Centraal",52.0894,5.1100,1],["HT","Houten",52.0276,5.1700,0],["AMF","Amersfoort Centraal",52.1533,5.3739,1],["ASD","Amsterdam Centraal",52.3789,4.9004,1],
-  ["RTD","Rotterdam Centraal",51.9250,4.4690,1],["DT","Delft",52.0067,4.3563,0],["GVC","Den Haag Centraal",52.0809,4.3249,1],["ZL","Zwolle",52.5047,6.0914,1],["EHV","Eindhoven Centraal",51.4433,5.4813,1],["GN","Groningen",53.2105,6.5641,1]];
-const STATIONS_SLEUTEL = "treinplek-stations-v1";
-const IC_SOORTEN = /^(IC|ICD|ICE|THA|EST|ICB|ICL|TGV|NJ|ICK)/i;
-const treinGroep = c => IC_SOORTEN.test(c || "") ? "IC" : "SPR";
-let testPos = null, autoPos = null, autoWatch = null, autoFilter = "alles", autoSecties = [], autoBezig = false, autoTijd = 0;
-
-async function laadStationsGeo() {
-  if (DEMO) return DEMO_STATIONS.map(([code, naam, lat, lng, ic]) => ({code, naam, lat, lng, ic}));
-  try { const b = JSON.parse(localStorage.getItem(STATIONS_SLEUTEL)); if (b && b.length > 50) return b; } catch (_) {}
-  const j = await api("/stations");
-  const lijst = (j.payload || j || []).map(x => ({
-    code: (x.id && x.id.code) || x.code,
-    naam: (x.names && (x.names.long || x.names.medium)) || (x.namen && (x.namen.lang || x.namen.middel)) || x.naam,
-    lat: x.location ? x.location.lat : x.lat, lng: x.location ? x.location.lng : x.lng, land: x.country || x.land
-  })).filter(x => x.code && Number.isFinite(x.lat) && Number.isFinite(x.lng) && (!x.land || x.land === "NL"));
-  if (!lijst.length) throw new Error("Geen stations van NS gekregen (controleer de /stations route in de Worker).");
-  try { localStorage.setItem(STATIONS_SLEUTEL, JSON.stringify(lijst)); } catch (_) {}
-  return lijst;
+// ====== AUTOMATISCH: TREINEN BIJ MIJ IN DE BUURT ======
+// Gebruikt je locatie, vraagt de Worker welke treinen er in de buurt rijden (/nabij) en per trein de rit (/rit): eindbestemming en haltes.
+const AUTO = {watch: null, timer: null, pos: null, bezig: false, opnieuw: false, data: null, filter: "ALLE", ritten: new Map()};
+const LOC_SLEUTEL = "treinplek-loc", FILTER_SLEUTEL = "treinplek-filter";
+try { AUTO.filter = localStorage.getItem(FILTER_SLEUTEL) || "ALLE"; } catch (_) {}
+const STRALEN = [3000, 8000, 20000, 50000]; // meter; wordt ruimer als er niets van de gekozen soort in de buurt is
+const kmTekst = m => m < 950 ? `${Math.max(10, Math.round(m / 10) * 10)} m` : `${(m / 1000).toFixed(m < 10000 ? 1 : 0).replace(".", ",")} km`;
+function afstandM(a, b) {
+  const R = 6371000, r = x => x * Math.PI / 180, dLat = r(b.lat - a.lat), dLng = r(b.lng - a.lng);
+  return 2 * R * Math.asin(Math.sqrt(Math.sin(dLat / 2) ** 2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(dLng / 2) ** 2));
 }
-function afstandKm(a, b) {
-  const r = Math.PI / 180, dLat = (b.lat - a.lat) * r, dLng = (b.lng - a.lng) * r;
-  return 12742 * Math.asin(Math.sqrt(Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLng / 2) ** 2));
+// Veldnamen gebaseerd op de NS-documentatie (Virtual Train API en Reisinformatie API). Klopt iets niet? Zie console.log.
+function leesNabij(j) {
+  const p = j.payload || j;
+  return (p.treinen || []).map(t => ({nr: String(t.ritId || t.treinNummer || t.ritnummer || ""), soort: String(t.type || "").toUpperCase(), lat: t.lat, lng: t.lng, snelheid: (t.snelheid || 0) / 3.6}))
+    .filter(t => t.nr && typeof t.lat === "number" && typeof t.lng === "number");
 }
-function leesVertrekAuto(j) {
-  return ((j.payload || j).departures || []).map(d => {
-    const p = d.product || {}, soort = p.shortCategoryName || p.categoryCode || "";
-    return {nr: p.number, soort, naar: d.direction, tijd: d.actualDateTime || d.plannedDateTime, gepland: d.plannedDateTime,
-      spoor: d.actualTrack || d.plannedTrack, vervalt: !!d.cancelled, groep: treinGroep(p.categoryCode || soort)};
-  }).filter(t => t.nr);
+function leesRit(j) {
+  const p = j.payload || j, ruw = p.stops || [];
+  const stops = ruw.map(s => {
+    const dep = (s.departures || [])[0] || {}, arr = (s.arrivals || [])[0] || {};
+    return {naam: (s.stop && s.stop.name) || s.name || "", status: String(s.status || ""), vertrek: dep.actualTime || dep.plannedTime || null, aankomst: arr.actualTime || arr.plannedTime || null};
+  }).filter(x => x.naam);
+  let stel = [];
+  for (const s of ruw) {
+    const delen = ((s.actualStock || s.plannedStock || {}).trainParts) || [];
+    const nrs = delen.map(d => String(d.stockIdentifier || "")).filter(x => /^\d{3,4}$/.test(x));
+    if (nrs.length) { stel = nrs; break; }
+  }
+  return {stops, stel, eind: stops.length ? stops[stops.length - 1].naam : ""};
 }
-function demoAuto(s) {
-  const nu = Date.now(), BEST = ["Zwolle","Eindhoven Centraal","Amsterdam Centraal","Rotterdam Centraal","Nijmegen","Leeuwarden","Schiphol Airport","Maastricht"];
-  const plan = s.ic ? [["IC",-6],["SPR",-2],["IC",4],["SPR",8],["ICE",12],["IC",19],["SPR",23]] : [["SPR",-5],["SPR",6],["SPR",21]];
-  return plan.map(([soort, min], i) => {
-    const t = new Date(nu + min * 60000).toISOString();
-    return {nr: String(2000 + (s.code.charCodeAt(0) * 7 + i * 113) % 7000), soort, naar: BEST[(i + s.code.length) % BEST.length], tijd: t, gepland: t, spoor: String(1 + i % 4), vervalt: false, groep: treinGroep(soort)};
+// Laatste halte waar de trein is vertrokken en eerstvolgende halte, uit de dienstregeling (alleen haltes waar de trein stopt).
+function ritStand(r, nu = Date.now()) {
+  if (!r) return {};
+  const st = r.stops.filter(x => !/PASSING/i.test(x.status));
+  let vi = -1; st.forEach((x, i) => { const t = x.vertrek && Date.parse(x.vertrek); if (t && t <= nu) vi = i; });
+  return {vorig: vi >= 0 ? st[vi] : null, volgend: st[vi + 1] || null};
+}
+// --- demodata voor de automatische modus ---
+const DEMO_RITTEN = [
+  {nr: "2150", soort: "IC",  af: 40,   v: 33, hoek: 80,  naar: "Zwolle",             vorig: ["Arnhem Centraal", -7],     volgend: ["Zutphen", 9],            stel: ["3205"]},
+  {nr: "6845", soort: "SPR", af: 420,  v: 20, hoek: 200, naar: "Dieren",             vorig: ["Arnhem Velperpoort", -3],  volgend: ["Arnhem Presikhaaf", 1],  stel: ["2315", "2710"]},
+  {nr: "105",  soort: "ICE", af: 1300, v: 50, hoek: 300, naar: "Amsterdam Centraal", vorig: ["Arnhem Centraal", -9],     volgend: ["Utrecht Centraal", 24],  stel: ["8012"]},
+  {nr: "1537", soort: "ICD", af: 2100, v: 38, hoek: 20,  naar: "Breda",              vorig: ["Rotterdam Centraal", -12], volgend: ["Dordrecht", 5],          stel: ["3355"]},
+  {nr: "4850", soort: "SPR", af: 4200, v: 18, hoek: 150, naar: "Utrecht Centraal",   vorig: ["Veenendaal-De Klomp", -2], volgend: ["Ede-Wageningen", 6],     stel: ["2410"]},
+  {nr: "1760", soort: "IC",  af: 9800, v: 35, hoek: 250, naar: "Den Haag Centraal",  vorig: ["Utrecht Centraal", -14],   volgend: ["Gouda", 8],              stel: ["8610", "9410"]}
+];
+function demoNabij(pos, straal) {
+  return DEMO_RITTEN.filter(r => r.af <= straal).map(r => {
+    const b = r.hoek * Math.PI / 180;
+    return {nr: r.nr, soort: r.soort, snelheid: r.v, lat: pos.lat + r.af * Math.cos(b) / 111320, lng: pos.lng + r.af * Math.sin(b) / (111320 * Math.cos(pos.lat * Math.PI / 180))};
   });
 }
-async function vertrekkenVan(s) {
-  let rijen = DEMO ? demoAuto(s) : leesVertrekAuto(await api(`/vertrek?station=${encodeURIComponent(s.code)}&dateTime=${encodeURIComponent(isoMetOffset(new Date(Date.now() - 20 * 60000)))}&maxJourneys=40`));
-  const nu = Date.now();
-  rijen = rijen.filter(t => { const m = (new Date(t.tijd) - nu) / 60000; return m > -20 && m < 45; }).sort((x, y) => new Date(x.tijd) - new Date(y.tijd));
-  return {...s, rijen, heeftIC: rijen.some(t => t.groep === "IC"), heeftSPR: rijen.some(t => t.groep === "SPR")};
+function demoRit(nr) {
+  const r = DEMO_RITTEN.find(x => x.nr === String(nr)), t = m => new Date(Date.now() + m * 60000).toISOString();
+  if (!r) return {stops: [], stel: [], eind: ""};
+  return {stel: r.stel, eind: r.naar, stops: [
+    {naam: r.vorig[0], status: "STOP", aankomst: t(r.vorig[1] - 1), vertrek: t(r.vorig[1])},
+    {naam: r.volgend[0], status: "STOP", aankomst: t(r.volgend[1]), vertrek: t(r.volgend[1] + 1)},
+    {naam: r.naar, status: "DESTINATION", aankomst: t(r.volgend[1] + 25)}]};
 }
-// Zoekt de 3 dichtstbijzijnde stations. Heeft geen van die een IC (of sprinter), dan wordt er verder weg gezocht (maximaal 10 stations).
-async function autoZoek() {
-  if (!autoPos || autoBezig) return;
-  autoBezig = true; melding("");
+// --- zoeken ---
+async function haalNabij(pos, straal) {
+  const lijst = DEMO ? demoNabij(pos, straal) : leesNabij(await api(`/nabij?lat=${pos.lat.toFixed(5)}&lng=${pos.lng.toFixed(5)}&radius=${straal}&limit=40`));
+  lijst.forEach(t => t.afstand = afstandM(pos, t));
+  return lijst.sort((x, y) => x.afstand - y.afstand);
+}
+async function zoekRitten(pos, filter) {
+  const begin = (pos.snelheid || 0) > 40 ? 1 : 0; // zeer snel (>144 km/u): meteen ruimer zoeken
+  for (let i = begin; i < STRALEN.length; i++) {
+    const lijst = await haalNabij(pos, STRALEN[i]);
+    const gefilterd = filter === "ALLE" ? lijst : lijst.filter(t => t.soort === filter);
+    if (gefilterd.length || i === STRALEN.length - 1) return {lijst, gefilterd, straal: STRALEN[i], begin: STRALEN[begin], tijd: Date.now()};
+  }
+}
+// Zit je in een trein? Dan is dat de trein die vlakbij is en ongeveer even snel gaat als jij.
+function zoekJouw(lijst, pos) {
+  const u = pos.snelheid;
+  const k = lijst.find(t => t.afstand < 300 && (u == null || Math.abs((t.snelheid || 0) - u) < 7));
+  return k ? k.nr : null;
+}
+async function autoVernieuw() {
+  if (!AUTO.pos) return;
+  if (AUTO.bezig) { AUTO.opnieuw = true; return; }
+  AUTO.bezig = true;
   try {
-    $("auto-status").textContent = "Treinen in de buurt zoeken…";
-    const alle = (await laadStationsGeo()).map(x => ({...x, km: afstandKm(autoPos, x)})).sort((a, b) => a.km - b.km);
-    const secties = await Promise.all(alle.slice(0, 3).map(vertrekkenVan));
-    for (let i = 3; i < Math.min(alle.length, 10) && !(secties.some(x => x.heeftIC) && secties.some(x => x.heeftSPR)); i++) secties.push(await vertrekkenVan(alle[i]));
-    autoSecties = secties; autoTijd = Date.now(); tekenAuto();
-  } catch (e) { $("auto-status").textContent = ""; melding("Treinen zoeken lukte niet: " + e.message); }
-  autoBezig = false;
+    const d = await zoekRitten(AUTO.pos, AUTO.filter);
+    d.jouw = zoekJouw(d.lijst, AUTO.pos);
+    AUTO.data = d; autoTekenLijst(); autoVerrijk();
+  } catch (e) { console.warn(e); autoFout(e.message || "Treinen zoeken lukt nu niet."); }
+  finally { AUTO.bezig = false; if (AUTO.opnieuw) { AUTO.opnieuw = false; autoVernieuw(); } }
 }
-const wanneer = t => { const m = Math.round((new Date(t.tijd) - Date.now()) / 60000); return m < 0 ? `vertrok ${-m} min geleden` : m === 0 ? "vertrekt nu" : `over ${m} min`; };
-function tekenAuto() {
-  const F = autoFilter, eerste = autoSecties[0], icStop = autoSecties.find(x => x.heeftIC), sprStop = autoSecties.find(x => x.heeftSPR);
-  const toon = (F === "IC" ? [icStop] : F === "SPR" ? [sprStop] : [eerste, icStop !== eerste ? icStop : null]).filter(Boolean);
-  const lijst = $("auto-lijst"); lijst.replaceChildren();
-  $("auto-status").textContent = autoSecties.length ? "" : "Je locatie opzoeken…";
-  if (!toon.length) lijst.append(h("li", {className: "leeg", textContent: "Geen treinen gevonden in de buurt. Probeer het tabblad Station."}));
-  toon.forEach(sec => {
-    const label = F === "SPR" ? "Dichtstbijzijnde stop met sprinters" : (F === "IC" || sec !== eerste) ? "Dichtstbijzijnde IC-stop" : "Dichtstbijzijnde station";
-    const km = sec.km < 10 ? sec.km.toFixed(1).replace(".", ",") : Math.round(sec.km);
-    lijst.append(h("li", {className: "sectie"}, h("span", {textContent: label}), h("b", {textContent: `${sec.naam}, ${km} km`}),
-      ...(F === "alles" && sec === eerste && !sec.heeftIC ? [h("span", {textContent: "Hier stoppen geen intercity's, daarom staat de dichtstbijzijnde IC-stop hieronder."})] : [])));
-    const rijen = sec.rijen.filter(t => F === "alles" || t.groep === F).slice(0, 10);
-    if (!rijen.length) lijst.append(h("li", {className: "leeg", textContent: "Geen treinen in de komende 45 minuten."}));
-    rijen.forEach(t => {
-      const laat = t.gepland ? Math.round((new Date(t.tijd) - new Date(t.gepland)) / 60000) : 0;
-      lijst.append(h("li", {}, h("button", {type: "button", className: t.vervalt ? "vervalt" : "", onclick: () => toonTrein(t.nr, {soort: t.soort, naar: t.naar, tijd: t.tijd, spoor: t.spoor})},
-        h("span", {className: "t", textContent: fmt(t.tijd)}),
-        h("span", {}, `${t.soort} naar ${t.naar || "?"}`, h("small", {}, `${wanneer(t)}${t.spoor ? " · spoor " + t.spoor : ""} · trein ${t.nr}`, ...(laat > 0 ? [h("span", {className: "laat", textContent: ` · +${laat} min`})] : []))),
-        h("span", {className: "tag " + t.groep, textContent: t.soort}))));
-    });
+async function autoVerrijk() {
+  const d = AUTO.data; if (!d) return;
+  const nodig = d.gefilterd.slice(0, 6).filter(t => { const c = AUTO.ritten.get(t.nr); return !c || Date.now() - c.t > 300000; });
+  if (!nodig.length) return;
+  await Promise.all(nodig.map(async t => {
+    try { AUTO.ritten.set(t.nr, {t: Date.now(), r: DEMO ? demoRit(t.nr) : leesRit(await api(`/rit?nummer=${encodeURIComponent(t.nr)}`))}); }
+    catch (e) { console.warn("rit", t.nr, e); AUTO.ritten.set(t.nr, {t: Date.now() - 240000, r: null}); }
+  }));
+  if (AUTO.data === d) autoTekenLijst();
+}
+// --- scherm ---
+function autoFout(tekst) {
+  $("auto-lijst").hidden = true; $("auto-start").hidden = false;
+  $("auto-tekst").textContent = tekst; $("auto-knop").textContent = "Opnieuw proberen";
+}
+function autoTekenLijst() {
+  const d = AUTO.data; if (!d) return;
+  $("auto-start").hidden = true; $("auto-lijst").hidden = false;
+  $("auto-status").textContent = `Bijgewerkt om ${fmt(new Date(d.tijd).toISOString())}`;
+  // filterknoppen: Alle, IC, SPR, ICE en wat er verder rondrijdt (ICD, enz.)
+  const tel = {}; d.lijst.forEach(t => { if (t.soort) tel[t.soort] = (tel[t.soort] || 0) + 1; });
+  const soorten = ["IC", "SPR", "ICE", ...Object.keys(tel).filter(x => !["IC", "SPR", "ICE"].includes(x)).sort()];
+  const chips = $("auto-chips"); chips.replaceChildren();
+  [["ALLE", "Alle", d.lijst.length], ...soorten.map(x => [x, x, tel[x] || 0])].forEach(([w, naam, n]) =>
+    chips.append(h("button", {type: "button", className: "chip", ariaPressed: String(AUTO.filter === w), onclick: () => {
+      AUTO.filter = w; try { localStorage.setItem(FILTER_SLEUTEL, w); } catch (_) {} autoVernieuw();
+    }}, naam, h("small", {textContent: String(n)}))));
+  const info = $("auto-info");
+  if (!d.gefilterd.length) { info.hidden = false; info.textContent = `Geen ${AUTO.filter === "ALLE" ? "treinen" : AUTO.filter} gevonden binnen ${kmTekst(d.straal)}.`; }
+  else if (d.straal > d.begin) { info.hidden = false; info.textContent = `Geen ${AUTO.filter === "ALLE" ? "trein" : AUTO.filter} binnen ${kmTekst(d.begin)}, daarom heb ik ruimer gezocht (tot ${kmTekst(d.straal)}).`; }
+  else info.hidden = true;
+  const ul = $("auto-ritten"); ul.replaceChildren();
+  d.gefilterd.slice(0, 8).forEach(t => {
+    const c = AUTO.ritten.get(t.nr), r = c && c.r, st = ritStand(r), jouw = d.jouw === t.nr;
+    const tijd = x => fmt(x.vertrek || x.aankomst);
+    ul.append(h("li", {}, h("button", {type: "button", className: "rit" + (jouw ? " jouw" : ""), onclick: () => autoKies(t)},
+      h("span", {className: "soort s-" + (t.soort || "x").toLowerCase(), textContent: t.soort || "?"}),
+      h("span", {}, jouw ? h("span", {className: "jouwtag", textContent: "Waarschijnlijk jouw trein"}) : "",
+        h("strong", {textContent: r && r.eind ? `naar ${r.eind}` : `Trein ${t.nr}`}),
+        st.vorig ? h("small", {textContent: `Vertrok ${tijd(st.vorig)} uit ${st.vorig.naam}`}) : "",
+        st.volgend ? h("small", {textContent: `Volgende: ${st.volgend.naam} ${fmt(st.volgend.aankomst || st.volgend.vertrek)}`}) : ""),
+      h("span", {className: "afst", textContent: t.afstand < 150 ? "bij jou" : kmTekst(t.afstand)}))));
   });
 }
-function autoGeenLocatie(tekst) {
-  $("auto-status").textContent = tekst + " Kies zelf een station of een treinnummer.";
-  $("auto-lijst").replaceChildren();
+function autoKies(t) {
+  const c = AUTO.ritten.get(t.nr), r = c && c.r, meta = {soort: t.soort, naar: (r && r.eind) || ""};
+  autoStop(); $("f-auto").hidden = true;
+  if (r && r.stel.length) { try { return toonStellen(r.stel, {nr: t.nr, ...meta}); } catch (e) { console.log("Stelnummers niet bruikbaar, ik gebruik de NS-samenstelling:", e.message); } }
+  toonTrein(t.nr, meta).then(() => { if ($("kaart").hidden && modus === "auto") { $("f-auto").hidden = false; autoStart(); } });
 }
+// --- locatie ---
 function autoStart() {
-  if (autoWatch !== null) return;
-  if (!navigator.geolocation) return autoGeenLocatie("Dit toestel geeft geen locatie door.");
-  $("auto-status").textContent = "Je locatie opzoeken…";
-  autoWatch = navigator.geolocation.watchPosition(p => {
-    if (testPos) return;
-    const eerder = autoPos;
-    autoPos = {lat: p.coords.latitude, lng: p.coords.longitude};
-    $("auto-hint").hidden = !(p.coords.speed > 8); // meer dan ongeveer 30 km/u: waarschijnlijk in een trein
-    if (!eerder || (afstandKm(eerder, autoPos) > 1.5 && Date.now() - autoTijd > 20000)) autoZoek();
-  }, err => { autoWatch = null; autoGeenLocatie(err.code === 1 ? "Je hebt geen toegang tot je locatie gegeven." : "Je locatie kon niet bepaald worden."); },
-  {enableHighAccuracy: true, maximumAge: 10000, timeout: 20000});
+  if (AUTO.watch !== null) return;
+  $("auto-lijst").hidden = true; $("auto-start").hidden = false;
+  $("auto-tekst").textContent = "Locatie bepalen…"; $("auto-knop").disabled = true;
+  if (!navigator.geolocation) { $("auto-knop").disabled = false; return autoFout("Deze browser geeft geen locatie door. Kies hieronder een andere manier."); }
+  AUTO.watch = navigator.geolocation.watchPosition(p => {
+    const eerste = !AUTO.pos;
+    AUTO.pos = {lat: p.coords.latitude, lng: p.coords.longitude, snelheid: p.coords.speed, nauw: p.coords.accuracy};
+    try { localStorage.setItem(LOC_SLEUTEL, "1"); } catch (_) {}
+    if (eerste) autoVernieuw();
+  }, f => {
+    $("auto-knop").disabled = false; autoStop();
+    autoFout(f.code === 1 ? "Locatie staat uit voor deze app. Zet hem aan bij Instellingen, Privacy, Locatievoorzieningen. Of kies hieronder een andere manier."
+      : "Ik kan je locatie nu niet bepalen. Probeer het buiten of bij een raam opnieuw, of kies hieronder een andere manier.");
+  }, {enableHighAccuracy: true, maximumAge: 5000, timeout: 20000});
+  AUTO.timer = setInterval(() => { if (!document.hidden) autoVernieuw(); }, 12000);
 }
-setInterval(() => { if (!document.hidden && !$("f-auto").hidden && autoPos && Date.now() - autoTijd > 45000) autoZoek(); }, 15000);
-document.querySelectorAll(".chip").forEach(b => b.onclick = () => {
-  autoFilter = b.dataset.f;
-  document.querySelectorAll(".chip").forEach(c => c.ariaPressed = String(c === b));
-  tekenAuto();
-});
-// Testplek kiezen (alleen in de testversie): zo kun je thuis proberen hoe de lijst reageert op locatie en snelheid.
-const TESTPLEKKEN = [["Mijn echte locatie (GPS)"], ["Bij Oosterbeek (alleen sprinters)", 51.9889, 5.8468, 0], ["Bij Arnhem Centraal (IC-station)", 51.9852, 5.8987, 0],
-  ["Bij Utrecht Centraal", 52.0894, 5.1100, 0], ["In een IC bij Wolfheze (rijdend)", 52.0051, 5.7916, 28], ["In een trein bij Houten (rijdend)", 52.0276, 5.1700, 30],
-  ["Op de Veluwe, ver van een station", 52.10, 5.78, 0]];
-if (DEMO) {
-  $("testplek-w").hidden = false;
-  TESTPLEKKEN.forEach((t, i) => $("testplek").append(h("option", {value: String(i), textContent: t[0]})));
-  $("testplek").onchange = () => {
-    const t = TESTPLEKKEN[Number($("testplek").value)];
-    if (!t[1]) { // terug naar echte GPS
-      testPos = null; autoPos = null; autoSecties = []; $("auto-hint").hidden = true;
-      if (autoWatch !== null) navigator.geolocation.clearWatch(autoWatch);
-      autoWatch = null; autoStart(); return;
-    }
-    testPos = autoPos = {lat: t[1], lng: t[2]}; $("auto-hint").hidden = !(t[3] > 8); autoTijd = 0; autoZoek();
-  };
+function autoStop() {
+  if (AUTO.watch !== null) navigator.geolocation.clearWatch(AUTO.watch);
+  clearInterval(AUTO.timer); AUTO.watch = null; AUTO.timer = null; AUTO.pos = null; AUTO.data = null; AUTO.opnieuw = false;
+  $("auto-knop").disabled = false;
 }
-$("auto-nieuw").onclick = () => { if (autoPos) { autoTijd = 0; autoZoek(); } else { autoWatch = null; autoStart(); } };
-$("auto-station").onclick = () => tab("station");
+$("auto-knop").onclick = () => { autoStop(); autoStart(); };
+$("auto-vernieuw").onclick = () => autoVernieuw();
 
 // ====== EVENTS ======
+let modus = "auto";
 function tab(naam) {
+  modus = naam;
   for (const n of ["auto", "nummer", "station", "stel"]) { $("tab-" + n).ariaSelected = String(n === naam); $("f-" + n).hidden = n !== naam; }
   $("treinen").hidden = true; melding("");
+  if (naam === "auto") { let gaf = false; try { gaf = !!localStorage.getItem(LOC_SLEUTEL); } catch (_) {} if (gaf) autoStart(); } else autoStop();
 }
-$("tab-auto").onclick = () => { tab("auto"); autoStart(); };
-$("tab-nummer").onclick = () => tab("nummer");
-$("tab-station").onclick = () => tab("station");
-$("tab-stel").onclick = () => tab("stel");
+for (const n of ["auto", "nummer", "station", "stel"]) $("tab-" + n).onclick = () => tab(n);
 
 $("f-nummer").onsubmit = e => { e.preventDefault(); toonTrein($("nummer").value.trim()); };
 
@@ -794,43 +872,27 @@ $("f-station").onsubmit = async e => {
 };
 
 $("draai").onclick = () => { omgekeerd = !omgekeerd; keuze = null; tekenKaart(); };
-$("terug").onclick = () => { $("kaart").hidden = true; $("zelf").hidden = false; keuze = null; if (!$("f-station").hidden && $("treinen").children.length) $("treinen").hidden = false; window.scrollTo({top: 0, behavior: "smooth"}); };
-// De foto wordt al gemaakt zodra je een plek kiest, zodat kopieren direct bij je tik kan (telefoons eisen dat).
-let fotoKlaar = null, fotoGeld = 0;
-async function fotoBlobMaken() {
-  const cv = await maakDeelplaatje();
-  return new Promise((ok, fout) => cv.toBlob(x => x ? ok(x) : fout(new Error("toBlob")), "image/png")); // het klembord neemt alleen png aan
-}
-function bereidFotoVoor() {
-  fotoKlaar = null;
-  if (!keuze) return;
-  const id = ++fotoGeld;
-  setTimeout(() => { if (id === fotoGeld) fotoBlobMaken().then(b => { if (id === fotoGeld) fotoKlaar = b; }).catch(e => console.warn(e)); }, 250);
-}
-const deelZin = () => `${zin()} ${titel()}.`;
-let kopieerTimer = 0;
-function kopieerMelding(tekst) {
-  $("kopieer").textContent = tekst; clearTimeout(kopieerTimer);
-  kopieerTimer = setTimeout(() => { $("kopieer").textContent = "Kopieer foto en tekst"; }, 3500);
-}
-$("kopieer").onclick = async () => {
+$("terug").onclick = () => { $("kaart").hidden = true; $("onder").hidden = false; keuze = null; if (!$("f-station").hidden && $("treinen").children.length) $("treinen").hidden = false; if (modus === "auto") { $("f-auto").hidden = false; autoStart(); } window.scrollTo({top: 0, behavior: "smooth"}); };
+$("deel").onclick = async () => {
   if (!keuze) return melding("Tik eerst op je plek in de trein.");
   melding("");
-  const foto = fotoKlaar ? Promise.resolve(fotoKlaar) : fotoBlobMaken(), tekst = new Blob([deelZin()], {type: "text/plain"});
+  const tekst = `${zin()} ${titel()}.`;
+  let blob;
+  try { const cv = await maakDeelplaatje(); blob = await new Promise((ok, fout) => cv.toBlob(x => x ? ok(x) : fout(new Error("toBlob")), "image/png")); }
+  catch (e) { console.warn(e); return deelTekst(tekst); }
+  const file = new File([blob], `treinplek-bak-${keuze.bak}.png`, {type: "image/png"});
   try {
-    try { await navigator.clipboard.write([new ClipboardItem({"image/png": foto, "text/plain": tekst})]); }
-    catch (e) { await navigator.clipboard.write([new ClipboardItem({"image/png": foto})]); } // sommige telefoons nemen plaatje en tekst niet samen aan
-    kopieerMelding("Gekopieerd! Plak het in je chat");
-  } catch (e) {
-    console.warn(e);
-    try { toonOverlay(URL.createObjectURL(await foto), deelZin()); } catch (_) { melding("Kopieren lukte niet."); }
-  }
+    if (navigator.canShare && navigator.canShare({files: [file]})) { await navigator.share({files: [file], text: tekst}); return; }
+  } catch (e) { if (e.name === "AbortError") return; console.warn(e); }
+  toonOverlay(URL.createObjectURL(blob), tekst);
 };
+async function deelTekst(tekst) {
+  try { if (navigator.share) await navigator.share({text: tekst}); else { await navigator.clipboard.writeText(tekst); melding("Tekst gekopieerd."); } } catch (_) {}
+}
 function toonOverlay(url, tekst) {
   const o = h("div", {id: "overlay"},
-    h("p", {textContent: "Kopieren lukte niet. Houd je vinger op het plaatje en kies Bewaar of Kopieer."}),
+    h("p", {textContent: "Houd je vinger op het plaatje en kies Bewaar of Deel."}),
     h("img", {src: url, alt: tekst}),
-    h("a", {className: "knop", href: url, download: "treinplek.jpg", textContent: "Opslaan als bestand", style: "max-width:300px;text-align:center;text-decoration:none;margin:0"}),
     h("button", {className: "knop", type: "button", textContent: "Sluiten", style: "max-width:300px", onclick: () => o.remove()}));
   document.body.append(o);
 }
@@ -839,7 +901,7 @@ function toonOverlay(url, tekst) {
 STATIONS.forEach(s => $("stations").append(h("option", {value: s[0]})));
 const nu = new Date(); $("tijd").value = `${pad(nu.getHours())}:${pad(nu.getMinutes())}`;
 $("demo").hidden = !DEMO;
-tab("auto"); autoStart();
+tab("auto");
 if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(e => console.log("sw", e)));
 </script>
 </body>
