@@ -108,12 +108,33 @@ html.rijdt,html.rijdt body{overflow-x:hidden}
 .rij-uit{animation:rijUit .75s cubic-bezier(.55,0,.9,.45) both}
 @keyframes rijIn{from{transform:translateX(115vw)}to{transform:none}}
 @keyframes rijUit{from{transform:none}to{transform:translateX(-125vw)}}
-.klein{display:block;margin:14px auto 0;padding:8px 12px;background:none;border:0;color:var(--muted);font-size:14px;text-decoration:underline}
+.kopbalk{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 12px}
+.kopbalk h1{margin:0}
+.tand{flex:none;width:48px;height:48px;display:grid;place-items:center;padding:0;border:2px solid var(--lijn);border-radius:50%;background:#fff;color:var(--blauw)}
+.tand svg,.ververs svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tand svg{width:26px;height:26px}
+.ververs{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px 8px 12px;border:2px solid var(--blauw);border-radius:999px;background:#fff;color:var(--blauw);font-weight:700;font-size:16px}
+.ververs svg{width:20px;height:20px;stroke-width:2.4}
+.inst{position:fixed;inset:0;z-index:50;overflow:auto;background:var(--bg);padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(32px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))}
+.inst-in{max-width:520px;margin:0 auto}
+.inst-kop{display:flex;align-items:center;justify-content:space-between;margin:8px 0 16px}
+.inst-kop h2{font:700 32px/1 'Barlow Condensed',sans-serif;margin:0}
+.inst-rij{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:10px 16px;background:#fff;border-radius:18px;font-weight:600}
+.schakel{flex:none;position:relative;width:56px;height:32px;padding:0;border:0;border-radius:16px;background:var(--lijn)}
+.schakel::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:transform .15s}
+.schakel[aria-checked=true]{background:var(--blauw)}
+.schakel[aria-checked=true]::after{transform:translateX(24px)}
+/* De trein onderaan staat er alleen als er niets anders op het scherm staat */
+body:has(#auto-lijst:not([hidden])) #treinlogo,body:has(#treinen:not([hidden])) #treinlogo,body:has(#kaart:not([hidden])) #treinlogo,body:has(#melding:not([hidden])) #treinlogo,
+body:has(#f-nummer:not([hidden])) #treinlogo,body:has(#f-station:not([hidden])) #treinlogo,body:has(#f-stel:not([hidden])) #treinlogo{display:none!important}
 [hidden]{display:none!important}
 </style>
 </head>
 <body>
-<h1>Waar zit ik in de trein?</h1>
+<header class="kopbalk">
+  <h1>Waar zit ik in de trein?</h1>
+  <button type="button" class="tand" id="inst-knop" aria-label="Instellingen"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+</header>
 <div id="demo" class="demo" hidden>Demo met nepdata. Vul bovenin het script je Worker-URL in voor echte treinen.</div>
 
 <div class="modi" role="tablist" aria-label="Zo vind je je trein">
@@ -137,7 +158,7 @@ html.rijdt,html.rijdt body{overflow-x:hidden}
     <small>Je locatie wordt alleen gebruikt om treinen in de buurt te zoeken en wordt niet bewaard.</small>
   </div>
   <div id="auto-lijst" hidden>
-    <div class="auto-kop"><span id="auto-status"></span><button class="klein" id="auto-vernieuw" type="button" aria-label="Vernieuwen">&#8635;</button></div>
+    <div class="auto-kop"><span id="auto-status"></span><button class="ververs" id="auto-vernieuw" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>Ververs</button></div>
     <div class="chips" id="auto-chips" role="group" aria-label="Filter op soort trein"></div>
     <p class="stelhulp" id="auto-info" hidden></p>
     <ul class="ritten" id="auto-ritten"></ul>
@@ -175,6 +196,22 @@ html.rijdt,html.rijdt body{overflow-x:hidden}
 <ul id="treinen" class="lijst" hidden></ul>
 
 <div id="onder">
+
+<svg id="treinlogo" viewBox="0 0 200 150" aria-hidden="true">
+  <rect x="82" y="2" width="36" height="9" rx="4.5" fill="currentColor"/>
+  <path d="M40 24Q40 11 56 11H144Q160 11 160 24V112Q160 124 148 124H52Q40 124 40 112Z" fill="currentColor"/>
+  <rect class="u" x="54" y="26" width="92" height="48" rx="13"/>
+  <rect x="98" y="26" width="4" height="48" fill="currentColor"/>
+  <circle class="u" cx="63" cy="98" r="8"/><circle class="u" cx="137" cy="98" r="8"/>
+  <rect class="u" x="87" y="92" width="26" height="14" rx="3"/>
+  <path d="M58 124l-9 22M142 124l9 22M28 146H172" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none"/>
+</svg>
+</div>
+
+<div id="inst" class="inst" role="dialog" aria-modal="true" aria-labelledby="inst-titel" hidden>
+<div class="inst-in">
+  <div class="inst-kop"><h2 id="inst-titel">Instellingen</h2><button class="knop" id="inst-sluit" type="button" style="width:auto;margin:0;padding:10px 20px">Klaar</button></div>
+  <div class="inst-rij"><span>Animatie</span><button type="button" id="beweging" class="schakel" role="switch" aria-checked="true" aria-label="Animatie"></button></div>
 <details id="zelf" class="zelf">
   <summary>Zelf trein samenstellen</summary>
   <form id="f-zelf">
@@ -190,16 +227,7 @@ html.rijdt,html.rijdt body{overflow-x:hidden}
     <small id="z-uitleg"></small>
   </form>
 </details>
-<svg id="treinlogo" viewBox="0 0 200 150" aria-hidden="true">
-  <rect x="82" y="2" width="36" height="9" rx="4.5" fill="currentColor"/>
-  <path d="M40 24Q40 11 56 11H144Q160 11 160 24V112Q160 124 148 124H52Q40 124 40 112Z" fill="currentColor"/>
-  <rect class="u" x="54" y="26" width="92" height="48" rx="13"/>
-  <rect x="98" y="26" width="4" height="48" fill="currentColor"/>
-  <circle class="u" cx="63" cy="98" r="8"/><circle class="u" cx="137" cy="98" r="8"/>
-  <rect class="u" x="87" y="92" width="26" height="14" rx="3"/>
-  <path d="M58 124l-9 22M142 124l9 22M28 146H172" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none"/>
-</svg>
-<button type="button" id="beweging" class="klein"></button>
+</div>
 </div>
 
 <section id="kaart" hidden aria-live="polite">
@@ -885,9 +913,15 @@ const RIJ = {bezig: false, uitgesteld: false}, STAP = 85; // STAP = ms tussen tw
 const BEW = "treinplek-beweging";
 const bewLees = () => { try { return localStorage.getItem(BEW) || "aan"; } catch (_) { return "aan"; } };
 const minderBeweging = () => bewLees() === "uit";
-const bewTekst = () => { $("beweging").textContent = "Animatie: " + bewLees(); };
+const bewTekst = () => $("beweging").setAttribute("aria-checked", String(bewLees() === "aan"));
 $("beweging").onclick = () => { try { localStorage.setItem(BEW, bewLees() === "aan" ? "uit" : "aan"); } catch (_) {} bewTekst(); };
 bewTekst();
+// Instellingen: tandwiel rechtsboven.
+const instOpen = () => { $("inst").hidden = false; document.body.style.overflow = "hidden"; $("inst-sluit").focus(); };
+const instSluit = () => { $("inst").hidden = true; document.body.style.overflow = ""; };
+$("inst-knop").onclick = instOpen; $("inst-sluit").onclick = instSluit;
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("inst").hidden) instSluit(); });
+$("f-zelf").addEventListener("submit", instSluit);
 function rijAnimatie(klasse, duur) {
   const baks = [...document.querySelectorAll("#bakken .bak")];
   if (!baks.length || minderBeweging()) return Promise.resolve();

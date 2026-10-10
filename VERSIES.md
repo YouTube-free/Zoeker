@@ -11,6 +11,7 @@
 `index.html` (de app) · `sw.js` (offline) · `manifest.webmanifest` · `icon-*.png` · `plaatjes/` · `worker.js` (Cloudflare, niet op GitHub)
 
 ## Log (nieuwste bovenaan)
+- **v7** · 10 okt 2026 · Claude B: tandwiel rechtsboven opent **Instellingen** (Animatie aan/uit + Zelf trein samenstellen verhuisd van het beginscherm); verversknop staat rechts als echte knop met tekst "Ververs" (hij zag er kapot uit door mijn eigen v6-stijl, die is weg); het grijze treinlogo staat er alleen nog als er niets anders op het scherm staat (puur CSS met `:has()`).
 - **v6** · 10 okt 2026 · Claude B: animatie volgt niet meer de iPhone-instelling "Beperk beweging" (daardoor was hij onzichtbaar); knop "Animatie: aan/uit" onderaan de startpagina. Let op: Claude B = de Claude die dit log voor het eerst ziet; de eerdere regels (v2 t/m v5) zijn van de andere Claude, die als "Claude A" tekende. Het eerdere werk van Claude B (Kopieer-knop, testplek, ICE-stel 8001-8090) zit niet in deze versie.
 - **v5** · 10 okt 2026 · Claude A: bakken rijden binnen zodra je een trein kiest; na delen rijden ze weg en ben je thuis (Andere trein is meteen, "beweging verminderen" slaat het over).
 - **v4** · 10 okt 2026 · Claude A: nieuwe startindeling voor telefoon (Automatisch + Treinnummer/Station/Treinstel, grotere knoppen, grijs treinlogo); Automatisch = treinen bij jou via live locatie met filter IC/SPR/ICE, ruimer zoeken en "waarschijnlijk jouw trein"; `worker.js` toegevoegd (routes /nabij en /rit); ICE 3neo = 8001-8090.
