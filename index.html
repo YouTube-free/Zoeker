@@ -462,16 +462,26 @@ async function maakDeelplaatje() {
   sub.forEach(t => { c.fillText(t, P, y); y += 44; });
   y += 28;
 
-  // --- Voorkant en achterkant ---
+  // --- Voorkant en achterkant van elk treindeel ---
   const ly = y + 4, lm = ly + 13;
-  c.font = `600 24px ${tekst}`;
-  c.strokeStyle = GEEL; c.fillStyle = GEEL; c.lineWidth = 5; c.lineCap = "round"; c.lineJoin = "round";
-  c.beginPath(); c.moveTo(sx0 + 30, lm); c.lineTo(sx0 + 2, lm); c.moveTo(sx0 + 14, lm - 12); c.lineTo(sx0 + 2, lm); c.lineTo(sx0 + 14, lm + 12); c.stroke();
-  c.fillText("VOORKANT", sx0 + 42, ly);
-  const vEind = sx0 + 42 + c.measureText("VOORKANT").width;
-  c.fillStyle = LICHT; c.textAlign = "right"; c.fillText("ACHTERKANT", sx1, ly); c.textAlign = "left";
-  const aStart = sx1 - c.measureText("ACHTERKANT").width;
-  c.strokeStyle = "rgba(255,255,255,.22)"; c.lineWidth = 2; c.beginPath(); c.moveTo(vEind + 16, lm); c.lineTo(aStart - 16, lm); c.stroke();
+  c.lineCap = "round"; c.lineJoin = "round";
+  let rx = sx0;
+  perDeel.forEach(deel => {
+    const w = deel.length * bw + gap * (deel.length - 1), x0 = rx, x1 = rx + w;
+    let fs = 24, vw = 0, aw = 0, pijl = true, V = "VOORKANT", A = "ACHTERKANT";
+    const meet = () => { c.font = `600 ${fs}px ${tekst}`; vw = c.measureText(V).width; aw = c.measureText(A).width; return vw + aw + (pijl ? 42 : 0) + 40; };
+    if (meet() > w) { V = "VOOR"; A = "ACHTER"; }   // smal deel: kortere woorden
+    if (meet() > w) pijl = false;
+    while (meet() > w && fs > 15) fs--;
+    meet();
+    const vx = x0 + (pijl ? 42 : 0);
+    c.strokeStyle = GEEL; c.fillStyle = GEEL; c.lineWidth = 5;
+    if (pijl) { c.beginPath(); c.moveTo(x0 + 30, lm); c.lineTo(x0 + 2, lm); c.moveTo(x0 + 14, lm - 12); c.lineTo(x0 + 2, lm); c.lineTo(x0 + 14, lm + 12); c.stroke(); }
+    c.textAlign = "left"; c.fillText(V, vx, ly);
+    c.fillStyle = LICHT; c.textAlign = "right"; c.fillText(A, x1, ly); c.textAlign = "left";
+    if (x1 - aw - 16 > vx + vw + 16) { c.strokeStyle = "rgba(255,255,255,.22)"; c.lineWidth = 2; c.beginPath(); c.moveTo(vx + vw + 16, lm); c.lineTo(x1 - aw - 16, lm); c.stroke(); }
+    rx += w + deelgap;
+  });
   y += 36 + 16;
 
   // --- Haakjes per treindeel ---
